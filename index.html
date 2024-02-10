@@ -2,60 +2,275 @@
 <html>
 <head>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-image: url('img/bg7.jpg');
+            background-size: cover;
+            background-position: center;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh; /* Full viewport height */
+            color: rgb(240, 243, 197);
+        }
+
+        header {
+            font-family: 'Pacifico', cursive;
+            text-align: center;
+            margin-bottom: 20px;
+            position: absolute;
+            top: 0;
+            left: 13%;
+            transform: translateX(-50%);
+        }
+
+        /* ... rest of your CSS ... */
+
+        header h1 {
+            font-size: 1.5em;
+            color: rgb(240, 243, 197);
+        }
+
+        span {
+            font-size: 3rem;
+        }
+
+        header .red {
+            color: red;
+        }
+
+        header .green {
+            color: green;
+        }
+
+        .custom-file-upload {
+            padding: 10px;
+            cursor: pointer;
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            border-radius: 5px;
+            color: #f6f60a;
+            font-weight: bold;
+            transition: background 0.3s ease;
+        }
+
+        .custom-file-upload:hover {
+            background: rgb(244 239 1 / 23%);
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        input[type="file"], select {
+            margin-bottom: 10px;
+        }
+        select {
+            width: 70%;
+            padding: 10px;
+            border-radius: 25px;
+            border: none;
+            background: rgba(255, 255, 255, 0.2);
+            color: #f6f60a;
+            appearance: none;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            transition: background 0.3s ease; /* Add transition */
+        }
+
+        select:hover {
+            background: rgb(244 239 1 / 23%); /* Change background on hover */
+        }
+
+        select option {
+            background: rgba(255, 255, 255, 0.1);
+            color: #000000;
+        }
+
+
+
+
+        #frameForm {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            border-radius: 10px;
+            padding: 20px;
+            width: 500px; /* Increase width */
+            height: 650px; /* Increase height */
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            align-items: center;
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+            border: 1px solid rgba(255, 255, 255, 0.18);
+        }
+
+        #frameForm button {
+            color: #05ad2c;
+            font-weight: bold;
+        }
+
+        #frameForm button {
+            background: rgba(255, 255, 255, 0.1);
+            border: none;
+            padding: 15px 30px; /* Increase size */
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background 0.3s ease;
+            color: #94f3a5; /* Change color */
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* Add box shadow */
+            margin-top: auto; /* Position at bottom */
+        }
+
+        #frameForm button:hover {
+            background: rgba(255, 255, 255, 0.2);
+        }
+
         #preview {
             position: relative;
-            width: 300px;
-            height: 300px;
+            width: 400px;
+            height: 400px;
         }
         #user_image_preview, #frame_preview {
             position: absolute;
             width: 100%;
             height: 100%;
+            object-fit: cover; /* Add this line */
+            object-position: center; /* Add this line */
         }
         #frame_preview {
             z-index: 2;
         }
+        .input-group {
+            display: flex;
+            justify-content: flex-start;
+            align-items: center;
+            width: 100%;
+            gap: 10px; /* Add gap */
+        }
+
+        
     </style>
 </head>
 <body>
-    <h1>Facebook Profile Image Frame Generator</h1>
+    <header>
+        <h1>
+            <span class="red">Frame</span><span class="green">Gen</span> 
+            by microdrgz
+        </h1>
+    </header>
 
-    <label for="user_image">Select image to upload:</label>
-    <input type="file" id="user_image">
+    <form id="frameForm">
+        <div class="input-group">
+            Upload your image:
+            <label for="user_image" class="custom-file-upload">Upload Profile</label>
+            <input type="file" id="user_image" style="display: none;">
+        </div>
 
-    <label for="frame">Select frame:</label>
-    <select id="frame">
-        <option value="frame1.png">Single & Blessed</option>
-        <option value="frame2.png">Waiting for God's Will</option>
-        <option value="frame3.png">Faithfully Committed</option>
-        <option value="frame4.png">Moving Forward</option>
-        <!-- Add more frames as needed -->
-    </select>
+        <div class="input-group">
+            <label for="frame">Select frame:</label>
+            <select id="frame">
+                <option value="frame1.png">Single & Blessed</option>
+                <option value="frame2.png">Waiting for God's Will</option>
+                <option value="frame3.png">Faithfully Committed</option>
+                <option value="frame4.png">Moving Forward</option>
+                <!-- Add more frames as needed -->
+            </select>
+        </div>
+        
+        <div id="preview">
+            <img id="user_image_preview">
+            <img id="frame_preview">
+        </div>
 
-    <button onclick="applyFrame()">Apply Frame</button>
-
-    <div id="preview">
-        <img id="user_image_preview">
-        <img id="frame_preview">
-    </div>
+        <button type="button" onclick="applyFrame()">Generate</button>
+    </form>
 
     <script>
     function applyFrame() {
         var frame = 'img/' + document.getElementById('frame').value;
         var userImage = document.getElementById('user_image').files[0];
 
-        var reader = new FileReader();
-        reader.onload = function(e) {
-            var image = new Image();
-            image.onload = function() {
-                // Display the user's image
-                document.getElementById('user_image_preview').src = e.target.result;
-                // Display the frame on top of the user's image
-                document.getElementById('frame_preview').src = frame;
+        // Check if a file has been selected
+        if (userImage) {
+            var reader = new FileReader();
+            reader.onload = function(e) {
+                var image = new Image();
+                image.onload = function() {
+                    // Display the user's image
+                    document.getElementById('user_image_preview').src = e.target.result;
+                    // Display the frame on top of the user's image
+                    document.getElementById('frame_preview').src = frame;
+
+                    // Draw the user's image and the frame onto a canvas
+                    var frameImage = new Image();
+                    frameImage.onload = function() {
+                        var canvas = document.createElement('canvas');
+                        // Set the canvas size to match the frame's size
+                        canvas.width = frameImage.width;
+                        canvas.height = frameImage.height;
+                        var ctx = canvas.getContext('2d');
+                        // Draw the user's image, scaled to fit the frame
+                        ctx.drawImage(image, 0, 0, frameImage.width, frameImage.height);
+                        // Draw the frame
+                        ctx.drawImage(frameImage, 0, 0);
+
+                        // Replace the generate button with download and reset buttons
+                        var form = document.getElementById('frameForm');
+                        var generateButton = form.querySelector('button');
+                        generateButton.style.display = 'none'; // Hide generate button
+
+                        // Create a div to hold the buttons
+                        var buttonDiv = document.createElement('div');
+                        buttonDiv.style.display = 'flex';
+                        buttonDiv.style.justifyContent = 'center';
+                        buttonDiv.style.width = '100%';
+                        buttonDiv.style.gap = '2rem';
+                        buttonDiv.style.position = 'absolute'; // Add this line
+                        buttonDiv.style.bottom = '30px'; // Add this line
+
+                        // Create download button
+                        var downloadButton = document.createElement('button');
+                        downloadButton.textContent = 'Download';
+                        downloadButton.type = 'button';
+                        downloadButton.onclick = function() {
+                            // Create a link
+                            var link = document.createElement('a');
+                            // Set the href to the canvas data URL
+                            link.href = canvas.toDataURL('image/png');
+                            // Set the download attribute to the desired file name
+                            link.download = 'download.png';
+                            // Trigger a click on the link
+                            link.click();
+                        };
+                        buttonDiv.appendChild(downloadButton); // Add download button to div
+
+                        // Create reset button
+                        var resetButton = document.createElement('button');
+                        resetButton.textContent = 'Reset';
+                        resetButton.type = 'button';
+                        resetButton.onclick = function() {
+                            // Remove the download and reset buttons
+                            form.removeChild(buttonDiv);
+                            // Show the generate button
+                            generateButton.style.display = 'block';
+                        };
+                        buttonDiv.appendChild(resetButton); // Add reset button to div
+
+                        form.appendChild(buttonDiv); // Add div to form
+                    };
+                    frameImage.src = frame;
+                };
+                image.src = e.target.result;
             };
-            image.src = e.target.result;
-        };
-        reader.readAsDataURL(userImage);
+            reader.readAsDataURL(userImage);
+        } else {
+            alert('Please select a file before generating.');
+        }
     }
     </script>
 </body>
