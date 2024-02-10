@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <style>
+        #preview {
+            position: relative;
+            width: 300px;
+            height: 300px;
+        }
+        #user_image_preview, #frame_preview {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+        }
+        #frame_preview {
+            z-index: 2;
+        }
+    </style>
+</head>
+<body>
+    <h1>Facebook Profile Image Frame Generator</h1>
+
+    <label for="user_image">Select image to upload:</label>
+    <input type="file" id="user_image">
+
+    <label for="frame">Select frame:</label>
+    <select id="frame">
+        <option value="frame1.png">Single & Blessed</option>
+        <option value="frame2.png">Waiting for God's Will</option>
+        <option value="frame3.png">Faithfully Committed</option>
+        <option value="frame4.png">Moving Forward</option>
+        <!-- Add more frames as needed -->
+    </select>
+
+    <button onclick="applyFrame()">Apply Frame</button>
+
+    <div id="preview">
+        <img id="user_image_preview">
+        <img id="frame_preview">
+    </div>
+
+    <script>
+    function applyFrame() {
+        var frame = 'img/' + document.getElementById('frame').value;
+        var userImage = document.getElementById('user_image').files[0];
+
+        var reader = new FileReader();
+        reader.onload = function(e) {
+            var image = new Image();
+            image.onload = function() {
+                // Display the user's image
+                document.getElementById('user_image_preview').src = e.target.result;
+                // Display the frame on top of the user's image
+                document.getElementById('frame_preview').src = frame;
+            };
+            image.src = e.target.result;
+        };
+        reader.readAsDataURL(userImage);
+    }
+    </script>
+</body>
+</html>

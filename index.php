@@ -152,8 +152,8 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_FILES['user_image']) && $_FI
     </div>
 </body>
 
-<script src="https://code.jquery.com/jquery-3.5.1.min.js"></script>
-<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+<script src="js/jquery-3.5.1.min.js"></script>
+<script src="js/jquery-ui.min.js"></script>
 
 
 <script>
