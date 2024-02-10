@@ -2,12 +2,15 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-color: #f0f0f0;
+    background-image: url('../img/bg7.jpg');
+    background-size: cover;
+    background-position: center;
     display: flex;
     flex-direction: column;
     justify-content: center;
     align-items: center;
     height: 100vh; /* Full viewport height */
+    color: rgb(240, 243, 197);
 }
 
 header {
@@ -16,15 +19,19 @@ header {
     margin-bottom: 20px;
     position: absolute;
     top: 0;
-    left: 50%;
+    left: 13%;
     transform: translateX(-50%);
 }
 
 /* ... rest of your CSS ... */
 
 header h1 {
-    font-size: 2em;
-    color: black;
+    font-size: 1.5em;
+    color: rgb(240, 243, 197);
+}
+
+span {
+    font-size: 3rem;
 }
 
 header .red {
@@ -35,70 +42,109 @@ header .green {
     color: green;
 }
 
-.container {
-    width: 100%;
-    max-width: 500px; /* Limit the maximum width of the form */
+.custom-file-upload {
+    padding: 10px;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    border-radius: 15px;
+    color: #f6f60a;
+    font-weight: bold;
+    transition: background 0.3s ease;
 }
 
-.form-container {
+.custom-file-upload:hover {
+    background: rgb(244 239 1 / 23%);
+}
+
+label {
+    display: block;
+    margin-bottom: 5px;
+}
+
+input[type="file"], select {
+    margin-bottom: 10px;
+}
+select {
+    width: 70%;
+    padding: 10px;
+    border-radius: 25px;
+    border: none;
+    background: rgba(255, 255, 255, 0.2);
+    color: #f6f60a;
+    appearance: none;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    transition: background 0.3s ease; /* Add transition */
+}
+
+select:hover {
+    background: rgb(244 239 1 / 23%); /* Change background on hover */
+}
+
+select option {
+    background: rgba(255, 255, 255, 0.1);
+    color: #000000;
+}
+
+
+
+
+#frameForm {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 10px;
+    padding: 20px;
+    width: 500px; /* Increase width */
+    height: 650px; /* Increase height */
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    gap: 10px;
     align-items: center;
-    background-color: #fff;
-    padding: 30px 20px;
-    border-radius: 5px;
-    box-shadow: 0 0 10px rgba(255, 0, 0, 0.1); /* Change shadow color to red */
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    border: 1px solid rgba(255, 255, 255, 0.18);
 }
 
-.form-container input[type="file"] {
-    margin-bottom: 40px;
+#frameForm button {
+    color: #05ad2c;
+    font-weight: bold;
 }
 
-.generate-button {
-    display: block;
-    width: 100%;
-    padding: 20px;
-    background-color: green;
-    color: white;
+#frameForm button {
+    background: rgba(255, 255, 255, 0.1);
     border: none;
+    padding: 15px 30px; /* Increase size */
     border-radius: 5px;
     cursor: pointer;
-    margin-top: 2rem;
-    font-size: large;
+    transition: background 0.3s ease;
+    color: #94f3a5; /* Change color */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* Add box shadow */
+    margin-top: auto; /* Position at bottom */
 }
 
-.generate-button:hover {
-    background-color: darkgreen;
+#frameForm button:hover {
+    background: rgba(255, 255, 255, 0.2);
 }
 
-.image-preview {
-    margin-top: 20px;
-    text-align: center;
+#preview {
+    position: relative;
+    width: 400px;
+    height: 400px;
 }
-
-.image-preview img {
-    max-width: 100%;
-    height: auto;
-}
-
-.image-preview a,
-.button {
-    display: inline-block;
-    margin: 10px;
-    padding: 10px 20px;
-    background-color: #ff0000; /* Change button color to red */
-    color: #fff;
-    text-decoration: none;
-    border-radius: 5px;
-}
-
-#frame {
+#user_image_preview, #frame_preview {
     position: absolute;
-    top: 0;
-    left: 0;
     width: 100%;
     height: 100%;
-    z-index: 1;
-    pointer-events: none;
+    object-fit: cover; /* Add this line */
+    object-position: center; /* Add this line */
+}
+#frame_preview {
+    z-index: 2;
+}
+.input-group {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    gap: 10px; /* Add gap */
 }
