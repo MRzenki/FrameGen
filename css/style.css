@@ -1,0 +1,104 @@
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-color: #f0f0f0;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100vh; /* Full viewport height */
+}
+
+header {
+    font-family: 'Pacifico', cursive;
+    text-align: center;
+    margin-bottom: 20px;
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+}
+
+/* ... rest of your CSS ... */
+
+header h1 {
+    font-size: 2em;
+    color: black;
+}
+
+header .red {
+    color: red;
+}
+
+header .green {
+    color: green;
+}
+
+.container {
+    width: 100%;
+    max-width: 500px; /* Limit the maximum width of the form */
+}
+
+.form-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    background-color: #fff;
+    padding: 30px 20px;
+    border-radius: 5px;
+    box-shadow: 0 0 10px rgba(255, 0, 0, 0.1); /* Change shadow color to red */
+}
+
+.form-container input[type="file"] {
+    margin-bottom: 40px;
+}
+
+.generate-button {
+    display: block;
+    width: 100%;
+    padding: 20px;
+    background-color: green;
+    color: white;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    margin-top: 2rem;
+    font-size: large;
+}
+
+.generate-button:hover {
+    background-color: darkgreen;
+}
+
+.image-preview {
+    margin-top: 20px;
+    text-align: center;
+}
+
+.image-preview img {
+    max-width: 100%;
+    height: auto;
+}
+
+.image-preview a,
+.button {
+    display: inline-block;
+    margin: 10px;
+    padding: 10px 20px;
+    background-color: #ff0000; /* Change button color to red */
+    color: #fff;
+    text-decoration: none;
+    border-radius: 5px;
+}
+
+#frame {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 1;
+    pointer-events: none;
+}
