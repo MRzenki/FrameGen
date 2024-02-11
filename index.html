@@ -21,8 +21,10 @@
                 <option value="frame2.png">Waiting for God's Will</option>
                 <option value="frame3.png">Faithfully Committed</option>
                 <option value="frame4.png">Moving Forward</option>
-                <option value="frame5.png">It's Complicated</option> <!-- Add your frame description here -->
-                <option value="frame6.png">Study First</option> <!-- Add your frame description here -->
+                <option value="frame5.png">It's Complicated</option> 
+                <option value="frame6.png">Study First</option> 
+                <option value="frame7.png">Blessed</option> 
+                <option value="frame8.png">In Love</option> 
                 <!-- Add more frames as needed -->
             </select>
         </div>
@@ -30,11 +32,11 @@
         <div id="preview">
             <img id="user_image_preview">
             <img id="frame_preview">
+            <!-- Move the canvas here -->
+            <canvas id="canvasId" style="visibility: hidden; border: 1px solid black;"></canvas>
         </div>
-        <!-- Add this to your HTML -->
-        <canvas id="canvasId" style="display: none;"></canvas>
 
-
+        
         <div class="input-group" id="upload_button">
             <!-- Upload your image: -->
             <label for="user_image" class="custom-file-upload">
