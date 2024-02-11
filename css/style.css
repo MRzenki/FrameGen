@@ -2,46 +2,40 @@ body {
     font-family: Arial, sans-serif;
     margin: 0;
     padding: 0;
-    background-image: url('../img/bg7.jpg');
+    background-image: url(../img/bg7.jpg);
     background-size: cover;
     background-position: center;
     display: flex;
     flex-direction: column;
-    justify-content: center;
+    justify-content: flex-start;
     align-items: center;
-    height: 100vh; /* Full viewport height */
+    height: 100vh;
     color: rgb(240, 243, 197);
 }
-
 header {
     font-family: 'Pacifico', cursive;
     text-align: center;
     margin-bottom: 20px;
-    position: absolute;
-    top: 0;
-    left: 13%;
-    transform: translateX(-50%);
+    width: 100%; /* Take up full width */
+    position: absolute; 
+    top: 0; 
+    left: 15%; 
+    transform: translateX(-50%); 
 }
-
 /* ... rest of your CSS ... */
-
 header h1 {
     font-size: 1.5em;
     color: rgb(240, 243, 197);
 }
-
 span {
     font-size: 3rem;
 }
-
 header .red {
     color: red;
 }
-
 header .green {
     color: green;
 }
-
 .custom-file-upload {
     padding: 10px;
     cursor: pointer;
@@ -52,16 +46,13 @@ header .green {
     font-weight: bold;
     transition: background 0.3s ease;
 }
-
 .custom-file-upload:hover {
     background: rgb(244 239 1 / 23%);
 }
-
 label {
     display: block;
     margin-bottom: 5px;
 }
-
 input[type="file"], select {
     margin-bottom: 10px;
 }
@@ -77,39 +68,36 @@ select {
     box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
     transition: background 0.3s ease; /* Add transition */
 }
-
 select:hover {
     background: rgb(244 239 1 / 23%); /* Change background on hover */
 }
-
 select option {
     background: rgba(255, 255, 255, 0.1);
     color: #000000;
 }
-
-
-
-
 #frameForm {
     background: rgba(255, 255, 255, 0.1);
     backdrop-filter: blur(10px);
     border-radius: 10px;
     padding: 20px;
     width: 500px; /* Increase width */
-    height: 650px; /* Increase height */
+    max-height: 70vh; /* Increase height */
+    min-width: 500px; 
     display: flex;
     flex-direction: column;
     gap: 10px;
     align-items: center;
     box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
     border: 1px solid rgba(255, 255, 255, 0.18);
+    flex: 1; /* Add this line */
+    margin-top: 50px; /* Adjust this value as needed */
+    /* margin-bottom: 50px;  */
+    padding-bottom: 6rem;
 }
-
 #frameForm button {
     color: #05ad2c;
     font-weight: bold;
 }
-
 #frameForm button {
     background: rgba(255, 255, 255, 0.1);
     border: none;
@@ -121,15 +109,28 @@ select option {
     box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* Add box shadow */
     margin-top: auto; /* Position at bottom */
 }
-
 #frameForm button:hover {
     background: rgba(255, 255, 255, 0.2);
 }
-
 #preview {
     position: relative;
-    width: 400px;
-    height: 400px;
+    width: 100%;
+    padding-top: 100%; /* Maintain a 1:1 aspect ratio */
+    height: 0; /* Reset height */
+    max-height: 500px;
+    background: rgba(255, 255, 255, 0.1); /* Semi-transparent white background */
+    border: 1px solid rgba(255, 255, 255, 0.2); /* Semi-transparent white border */
+    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2), -5px -5px 15px rgba(255, 255, 255, 0.1); /* Shadows for depth */
+    backdrop-filter: blur(10px); /* Blur the background */
+}
+
+#preview > img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
 }
 #user_image_preview, #frame_preview {
     position: absolute;
@@ -140,11 +141,171 @@ select option {
 }
 #frame_preview {
     z-index: 2;
+    width: 100%;
+    height: 100%;
 }
+
+
 .input-group {
     display: flex;
     justify-content: center;
     align-items: center;
     width: 100%;
     gap: 10px; /* Add gap */
+}
+
+
+/* ... rest of your CSS ... */
+
+
+/* Media query for tablets devices */
+
+@media (max-width: 1300px) {
+    #frameForm {
+        width: auto;
+        max-height: 60vh;
+    }
+
+    header {
+        position: static; /* Reset position */
+        top: auto; /* Reset top */
+        left: auto; /* Reset left */
+        transform: none; /* Reset transform */
+    }
+}
+
+
+@media (max-width: 1024px) {
+    body {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    header {
+        position: static; /* Reset position */
+        top: auto; /* Reset top */
+        left: auto; /* Reset left */
+        transform: none; /* Reset transform */
+    }
+}
+
+@media (max-width: 1300px) {
+    #frameForm {
+        width: auto;
+    }
+
+    header {
+        left: 50%;
+    }
+}
+
+@media (max-width: 790px) {
+    #frameForm {
+        min-width: 300px; /* Adjust this value as needed */
+        /* height: auto; Remove or comment out this line */
+        max-height: 50vh;
+    }
+}
+
+@media (max-width: 768px) {
+    body {
+        flex-direction: column;
+        align-items: center;
+    }
+
+
+
+    header {
+        left: auto;
+    }
+
+    #preview {
+        width: 100%; 
+        height: auto;
+    }
+
+    #user_image_preview, #frame_preview {
+        width: 100%; 
+        height: auto; 
+    }
+
+    select {
+        width: 100%; 
+    }
+}
+
+@media (max-width: 576px) {
+    body {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    header {
+        left: 50%;
+    }
+
+    #frameForm {
+        /* height: 700px; Remove or comment out this line */
+        padding: 5px; 
+        min-width: 100vw; /* 100% of the viewport width */
+        max-height: 30vh;
+    }
+
+    #preview {
+        width: 100%; 
+        height: 300px;
+    }
+
+    #user_image_preview, #frame_preview {
+        width: 100%; 
+        height: auto;
+    }
+    
+    #user_image_preview, #frame_preview {
+        position: absolute;
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        object-position: center;
+    }
+
+    #frame_preview {
+        width: 100%; 
+        height: 300px; 
+    }
+
+    select {
+        width: 100%; 
+    }
+}
+
+@media (max-width: 480px) {
+    body {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    header {
+        left: 50%;
+    }
+
+    #frameForm {
+        width: 85%; 
+        /* height: 700px; Remove or comment out this line */
+        padding: 5px;
+    }
+
+    #preview {
+        width: 100%;
+        height: auto;
+    }
+
+    #user_image_preview, #frame_preview {
+        width: 100%; 
+        height: 500px; 
+    }
+
+    select {
+        width: 100%; 
+    }
 }

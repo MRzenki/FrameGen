@@ -1,3 +1,15 @@
+// Function to set initial frame
+function setInitialFrame() {
+    var frameSelect = document.getElementById('frame');
+    if (frameSelect.options.length > 0) {
+        frameSelect.selectedIndex = 0; // Select the first option
+        frameSelect.dispatchEvent(new Event('change')); // Trigger the change event
+    }
+}
+
+// Call the function when the page loads
+window.onload = setInitialFrame;
+
 // Function to handle user image selection
 function handleUserImageChange() {
     var frameSelect = document.getElementById('frame');
@@ -79,7 +91,7 @@ function createButtonDiv() {
     buttonDiv.style.width = '100%';
     buttonDiv.style.gap = '2rem';
     buttonDiv.style.position = 'absolute';
-    buttonDiv.style.bottom = '30px';
+    buttonDiv.style.bottom = '10px';
 
     buttonDiv.appendChild(createDownloadButton());
     buttonDiv.appendChild(createResetButton());
