@@ -8,20 +8,43 @@ var imageWidth = 0;
 var imageHeight = 0;
 var canvas = document.getElementById('canvasId');
 var image = new Image(); // Move the image object to the global scope
-
-// Get the frame select element
 var frameSelect = document.getElementById('frame');
+
+document.getElementById('canvasId').style.cursor = 'move';
+
+// Call the function when the page loads
+window.onload = function() {
+    preloadFrameImages();
+    setInitialFrame();
+};
+
+// drawImageAndFrame For PC
+function drawImageAndFrame() {
+    var canvas = document.getElementById('canvasId');
+    var ctx = canvas.getContext('2d');
+    var frameImage = document.getElementById('frame_preview');
+
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.save();
+    ctx.translate(translate.x + imageWidth / 2, translate.y + imageHeight / 2); // Translate to the center of the image
+    ctx.rotate(rotation); // Apply the rotation
+    ctx.scale(scaleFactor, scaleFactor);
+    ctx.drawImage(offscreenCanvas, -imageWidth / 2, -imageHeight / 2, imageWidth, imageHeight); // Draw the image at the center
+    ctx.restore();
+    ctx.drawImage(frameImage, 0, 0, canvas.width, canvas.height);
+}
+
+// Add event listeners
+document.getElementById('user_image').addEventListener('change', handleUserImageChange);
+document.getElementById('frame').addEventListener('change', handleFrameChange);
 
 // Add an event listener to the frame select element
 frameSelect.addEventListener('change', function() {
     // Get the user's image
     var userImage = document.getElementById('user_image_preview').src;
-
     // Load the user's image and the new frame on the canvas
     loadImage(userImage);
 });
-
-document.getElementById('canvasId').style.cursor = 'move';
 
 // Function to set initial frame
 function setInitialFrame() {
@@ -30,12 +53,6 @@ function setInitialFrame() {
         frameSelect.dispatchEvent(new Event('change')); // Trigger the change event
     }
 }
-
-// Call the function when the page loads
-window.onload = function() {
-    preloadFrameImages();
-    setInitialFrame();
-};
 
 // Function to handle user image selection
 function handleUserImageChange() {
@@ -63,55 +80,34 @@ function handleUserImageChange() {
     }
 }
 
-// Function to handle reset button click
-function handleResetButtonClick() {
-    // Reset the scale factor, translation, and rotation
-    scaleFactor = 1;
-    translate = { x: 0, y: 0 };
-    rotation = 0;
+// Map to store the preloaded frame images
+var frameImages = new Map();
 
-    // Redraw the image with the initial scale factor, position, and rotation
-    var userImageSrc = document.getElementById('user_image_preview').src;
-    if (userImageSrc) {
-        var canvas = document.getElementById('canvasId');
-        var image = new Image();
-        image.onload = function() {
-            var scaleX = 1080 / image.width * scaleFactor;
-            var scaleY = 1080 / image.height * scaleFactor;
-            var scale = Math.max(scaleX, scaleY);
-
-            imageWidth = image.width * scale;
-            imageHeight = image.height * scale;
-
-            // Calculate the center of the canvas
-            var centerX = canvas.width / 2;
-            var centerY = canvas.height / 2;
-
-            // Adjust the position of the image so it's centered
-            imageX = centerX - imageWidth / 2;
-            imageY = centerY - imageHeight / 2;
-
-            drawImageAndFrame(userImageSrc); // Call drawImageAndFrame instead of loadImage
-        };
-        image.src = userImageSrc;
+// Function to preload frame images
+function preloadFrameImages() {
+    for (var i = 0; i < frameSelect.options.length; i++) {
+        var frameImage = new Image();
+        frameImage.src = 'img/' + frameSelect.options[i].value;
+        frameImages.set(frameSelect.options[i].value, frameImage);
     }
-
-    // Reset the form
-    // document.getElementById('frameForm').reset();
-
-    // Display the user's image in the preview div
-    displayUserImage(userImageSrc);
 }
 
-document.addEventListener('DOMContentLoaded', function() {
-    // Add an event listener to the reset button
-    var resetButton = document.getElementById('resetButtonId');
-    if (resetButton) {
-        resetButton.addEventListener('click', handleResetButtonClick);
-    } else {
-        console.error('Reset button not found');
+// Function to handle frame change
+function handleFrameChange() {
+    var frame = this.value;
+
+    // Get the preloaded frame image
+    var frameImage = frameImages.get(frame);
+    document.getElementById('frame_preview').src = frameImage.src;
+
+    var userImageSrc = document.getElementById('user_image_preview').src;
+    if (!userImageSrc) {
+        return; // Return if the user image is not loaded
     }
-});
+
+    // Draw the user's image and the new frame on the canvas
+    loadImage(userImageSrc);
+}
 
 // Function to display user's image
 function displayUserImage(imageSrc) {
@@ -144,8 +140,8 @@ function loadImage(imageSrc) {
         var centerY = canvas.height / 2;
 
         // Adjust the position of the image so it's centered
-        imageX = imageX || centerX - imageWidth / 2;
-        imageY = imageY || centerY - imageHeight / 2;
+        imageX = translate.x || centerX - imageWidth / 2;
+        imageY = translate.y || centerY - imageHeight / 2;
 
         // Draw the image onto the offscreen canvas
         offscreenCanvas.width = imageWidth;
@@ -161,20 +157,6 @@ function loadImage(imageSrc) {
     image.src = imageSrc; // Set the src after defining the onload function
 }
 
-function drawImageAndFrame() {
-    var canvas = document.getElementById('canvasId');
-    var ctx = canvas.getContext('2d');
-    var frameImage = document.getElementById('frame_preview');
-
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.save();
-    ctx.translate(translate.x + imageWidth / 2, translate.y + imageHeight / 2); // Translate to the center of the image
-    ctx.rotate(rotation); // Apply the rotation
-    ctx.scale(scaleFactor, scaleFactor);
-    ctx.drawImage(offscreenCanvas, -imageWidth / 2, -imageHeight / 2, imageWidth, imageHeight); // Draw the image at the center
-    ctx.restore();
-    ctx.drawImage(frameImage, 0, 0, canvas.width, canvas.height);
-}
 
 document.getElementById('canvasId').addEventListener('mousemove', function(e) {
     var rect = this.getBoundingClientRect();
@@ -248,12 +230,8 @@ document.getElementById('canvasId').addEventListener('wheel', function(e) {
 
 
 
+// ------------------ -------------------- this is the border --------------- -------------------
 
-// Function to set initial frame
-function setInitialFrame() {
-    var frameSelect = document.getElementById('frame');
-    frameSelect.dispatchEvent(new Event('change'));
-}
 
 // Function to replace buttons
 function replaceButtons() {
@@ -347,36 +325,51 @@ function createResetButton() {
     return resetButton;
 }
 
-// Map to store the preloaded frame images
-var frameImages = new Map();
+// Function to handle reset button click
+function handleResetButtonClick() {
+    // Reset the scale factor and translation
+    scaleFactor = 1;
+    translate = { x: 0, y: 0 };
 
-// Function to preload frame images
-function preloadFrameImages() {
-    var frameSelect = document.getElementById('frame');
-    for (var i = 0; i < frameSelect.options.length; i++) {
-        var frameImage = new Image();
-        frameImage.src = 'img/' + frameSelect.options[i].value;
-        frameImages.set(frameSelect.options[i].value, frameImage);
-    }
-}
-
-// Function to handle frame change
-function handleFrameChange() {
-    var frame = this.value;
-
-    // Get the preloaded frame image
-    var frameImage = frameImages.get(frame);
-    document.getElementById('frame_preview').src = frameImage.src;
-
+    // Redraw the image with the initial scale factor and position
     var userImageSrc = document.getElementById('user_image_preview').src;
-    if (!userImageSrc) {
-        return; // Return if the user image is not loaded
+    if (userImageSrc) {
+        var canvas = document.getElementById('canvasId');
+        var image = new Image();
+        image.onload = function() {
+            var scaleX = 1080 / image.width * scaleFactor;
+            var scaleY = 1080 / image.height * scaleFactor;
+            var scale = Math.max(scaleX, scaleY);
+
+            imageWidth = image.width * scale;
+            imageHeight = image.height * scale;
+
+            // Calculate the center of the canvas
+            var centerX = canvas.width / 2;
+            var centerY = canvas.height / 2;
+
+            // Adjust the position of the image so it's centered
+            imageX = centerX - imageWidth / 2;
+            imageY = centerY - imageHeight / 2;
+
+            drawImageAndFrame(userImageSrc); // Call drawImageAndFrame instead of loadImage
+        };
+        image.src = userImageSrc;
     }
 
-    // Draw the user's image and the new frame on the canvas
-    loadImage(userImageSrc, imageX, imageY);
+    // Reset the form
+    // document.getElementById('frameForm').reset();
+
+    // Display the user's image in the preview div
+    displayUserImage(userImageSrc);
 }
 
-// Add event listeners
-document.getElementById('user_image').addEventListener('change', handleUserImageChange);
-document.getElementById('frame').addEventListener('change', handleFrameChange);
+document.addEventListener('DOMContentLoaded', function() {
+    // Add an event listener to the reset button
+    var resetButton = document.getElementById('resetButtonId');
+    if (resetButton) {
+        resetButton.addEventListener('click', handleResetButtonClick);
+    } else {
+        console.error('Reset button not found');
+    }
+});
