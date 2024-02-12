@@ -65,11 +65,12 @@ function handleUserImageChange() {
 
 // Function to handle reset button click
 function handleResetButtonClick() {
-    // Reset the scale factor and translation
+    // Reset the scale factor, translation, and rotation
     scaleFactor = 1;
     translate = { x: 0, y: 0 };
+    rotation = 0;
 
-    // Redraw the image with the initial scale factor and position
+    // Redraw the image with the initial scale factor, position, and rotation
     var userImageSrc = document.getElementById('user_image_preview').src;
     if (userImageSrc) {
         var canvas = document.getElementById('canvasId');
@@ -167,9 +168,10 @@ function drawImageAndFrame() {
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.save();
-    ctx.translate(translate.x, translate.y);
+    ctx.translate(translate.x + imageWidth / 2, translate.y + imageHeight / 2); // Translate to the center of the image
+    ctx.rotate(rotation); // Apply the rotation
     ctx.scale(scaleFactor, scaleFactor);
-    ctx.drawImage(offscreenCanvas, imageX, imageY, imageWidth, imageHeight);
+    ctx.drawImage(offscreenCanvas, -imageWidth / 2, -imageHeight / 2, imageWidth, imageHeight); // Draw the image at the center
     ctx.restore();
     ctx.drawImage(frameImage, 0, 0, canvas.width, canvas.height);
 }
@@ -182,8 +184,8 @@ document.getElementById('canvasId').addEventListener('mousemove', function(e) {
     if (isDragging) {
         var dx = (x - dragStartX) / scaleFactor;
         var dy = (y - dragStartY) / scaleFactor;
-        imageX += dx;
-        imageY += dy;
+        translate.x += dx;
+        translate.y += dy;
         dragStartX = x;
         dragStartY = y;
 
@@ -275,6 +277,7 @@ function createButtonDiv() {
     buttonDiv.style.width = '100%';
     buttonDiv.style.gap = '2rem';
     buttonDiv.style.position = 'relative';
+    buttonDiv.style.marginTop = '20px'; // Add a margin to the top of the buttonDiv
 
     buttonDiv.appendChild(createDownloadButton());
     buttonDiv.appendChild(createResetButton());
@@ -286,10 +289,18 @@ function createButtonDiv() {
 function createDownloadButton() {
     var downloadButton = document.createElement('button');
     downloadButton.type = 'button';
+    downloadButton.style.fontSize = '10px'; // Adjust the font size of the button text
+    downloadButton.style.display = 'flex'; // Make the button a flex container
+    downloadButton.style.flexDirection = 'column'; // Stack the icon and text vertically
+    downloadButton.style.width = '60px'; // Set the width of the button
+    downloadButton.style.height = '60px'; // Set the height of the button
+    downloadButton.style.alignItems = 'center'; // Center the contents of the button
+    downloadButton.style.justifyContent = 'center'; // Center the contents of the button
 
     var downloadImage = document.createElement('img');
     downloadImage.src = 'img/download.png'; // Set the image URL
-    downloadImage.style.marginRight = '5px'; // Add some space between the image and the text
+    downloadImage.style.width = '30px'; // Adjust the width of the image
+    downloadImage.style.height = '30px'; // Adjust the height of the image
 
     downloadButton.appendChild(downloadImage);
     downloadButton.appendChild(document.createTextNode('Download')); // Use createTextNode to add text
@@ -314,14 +325,22 @@ function createDownloadButton() {
 function createResetButton() {
     var resetButton = document.createElement('button');
     resetButton.type = 'button';
-    resetButton.id = 'resetButtonId'; // Add this line to set the ID of the reset button
+    resetButton.style.fontSize = '10px'; // Adjust the font size of the button text
+    resetButton.id = 'resetButtonId'; // Set the ID of the reset button
+    resetButton.style.width = '60px'; // Set the width of the button
+    resetButton.style.height = '60px'; // Set the height of the button
+    resetButton.style.display = 'flex'; // Make the button a flex container
+    resetButton.style.flexDirection = 'column'; // Stack the icon and text vertically
+    resetButton.style.alignItems = 'center'; // Center the contents of the button
+    resetButton.style.justifyContent = 'center'; // Center the contents of the button
 
     var resetImage = document.createElement('img');
     resetImage.src = 'img/reset.png'; // Set the image URL
-    resetImage.style.marginRight = '5px'; // Add some space between the image and the text
+    resetImage.style.width = '30px'; // Adjust the width of the image
+    resetImage.style.height = '30px'; // Adjust the height of the image
 
     resetButton.appendChild(resetImage);
-    resetButton.appendChild(document.createTextNode('Reset')); // Use createTextNode to add text
+    resetButton.appendChild(document.createTextNode('Recenter')); // Use createTextNode to add text
 
     resetButton.onclick = handleResetButtonClick; // Add the event listener here
 
