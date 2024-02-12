@@ -25,7 +25,6 @@ document.getElementById('canvasId').style.cursor = 'move';
 
 // Function to set initial frame
 function setInitialFrame() {
-    var frameSelect = document.getElementById('frame');
     if (frameSelect.options.length > 0) {
         frameSelect.selectedIndex = 0; // Select the first option
         frameSelect.dispatchEvent(new Event('change')); // Trigger the change event
@@ -33,7 +32,10 @@ function setInitialFrame() {
 }
 
 // Call the function when the page loads
-window.onload = setInitialFrame;
+window.onload = function() {
+    preloadFrameImages();
+    setInitialFrame();
+};
 
 // Function to handle user image selection
 function handleUserImageChange() {
@@ -57,14 +59,15 @@ function handleUserImageChange() {
         };
         reader.readAsDataURL(userFile);
     } else {
-        alert('Please select a file before generating.');
+        alert('Please select a file before downloading.');
     }
 }
 
 // Function to handle reset button click
 function handleResetButtonClick() {
-    // Reset the scale factor
+    // Reset the scale factor and translation
     scaleFactor = 1;
+    translate = { x: 0, y: 0 };
 
     // Redraw the image with the initial scale factor and position
     var userImageSrc = document.getElementById('user_image_preview').src;
@@ -93,7 +96,7 @@ function handleResetButtonClick() {
     }
 
     // Reset the form
-    document.getElementById('frameForm').reset();
+    // document.getElementById('frameForm').reset();
 
     // Display the user's image in the preview div
     displayUserImage(userImageSrc);
@@ -115,8 +118,9 @@ function displayUserImage(imageSrc) {
 }
 
 var scaleFactor = 1; // Initialize the scale factor
+var offscreenCanvas = document.createElement('canvas');
+var offscreenCtx = offscreenCanvas.getContext('2d');
 
-// Modify this function
 function loadImage(imageSrc) {
     var canvas = document.getElementById('canvasId');
     var ctx = canvas.getContext('2d');
@@ -139,47 +143,35 @@ function loadImage(imageSrc) {
         var centerY = canvas.height / 2;
 
         // Adjust the position of the image so it's centered
-        imageX = centerX - imageWidth / 2;
-        imageY = centerY - imageHeight / 2;
+        imageX = imageX || centerX - imageWidth / 2;
+        imageY = imageY || centerY - imageHeight / 2;
 
-        var tempCanvas = document.createElement('canvas');
-        tempCanvas.width = imageWidth;
-        tempCanvas.height = imageHeight;
-        var tempCtx = tempCanvas.getContext('2d');
-        tempCtx.drawImage(image, 0, 0, imageWidth, imageHeight);
+        // Draw the image onto the offscreen canvas
+        offscreenCanvas.width = imageWidth;
+        offscreenCanvas.height = imageHeight;
+        offscreenCtx.clearRect(0, 0, offscreenCanvas.width, offscreenCanvas.height);
+        offscreenCtx.drawImage(image, 0, 0, imageWidth, imageHeight);
 
-        ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
-        ctx.drawImage(tempCanvas, imageX, imageY, imageWidth, imageHeight); // Draw the image at the new position
+        // Draw the offscreen canvas onto the main canvas
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        ctx.drawImage(offscreenCanvas, imageX, imageY, imageWidth, imageHeight);
         ctx.drawImage(frameImage, 0, 0, canvas.width, canvas.height);
     };
     image.src = imageSrc; // Set the src after defining the onload function
 }
 
-function drawImageAndFrame(imageSrc) {
+function drawImageAndFrame() {
     var canvas = document.getElementById('canvasId');
     var ctx = canvas.getContext('2d');
     var frameImage = document.getElementById('frame_preview');
 
-    var image = new Image();
-    image.onload = function() {
-        var scaleX = 1080 / image.width * scaleFactor;
-        var scaleY = 1080 / image.height * scaleFactor;
-        var scale = Math.max(scaleX, scaleY);
-
-        imageWidth = image.width * scale;
-        imageHeight = image.height * scale;
-
-        var tempCanvas = document.createElement('canvas');
-        tempCanvas.width = imageWidth;
-        tempCanvas.height = imageHeight;
-        var tempCtx = tempCanvas.getContext('2d');
-        tempCtx.drawImage(image, 0, 0, imageWidth, imageHeight);
-
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(tempCanvas, imageX, imageY, imageWidth, imageHeight);
-        ctx.drawImage(frameImage, 0, 0, canvas.width, canvas.height);
-    };
-    image.src = imageSrc;
+    ctx.clearRect(0, 0, canvas.width, canvas.height);
+    ctx.save();
+    ctx.translate(translate.x, translate.y);
+    ctx.scale(scaleFactor, scaleFactor);
+    ctx.drawImage(offscreenCanvas, imageX, imageY, imageWidth, imageHeight);
+    ctx.restore();
+    ctx.drawImage(frameImage, 0, 0, canvas.width, canvas.height);
 }
 
 document.getElementById('canvasId').addEventListener('mousemove', function(e) {
@@ -188,17 +180,19 @@ document.getElementById('canvasId').addEventListener('mousemove', function(e) {
     var y = e.clientY - rect.top;
 
     if (isDragging) {
-        imageX = x - dragStartX;
-        imageY = y - dragStartY;
+        var dx = (x - dragStartX) / scaleFactor;
+        var dy = (y - dragStartY) / scaleFactor;
+        imageX += dx;
+        imageY += dy;
+        dragStartX = x;
+        dragStartY = y;
 
         // Use requestAnimationFrame to make the movement smoother
         requestAnimationFrame(function() {
-            var canvas = document.getElementById('canvasId');
-            var ctx = canvas.getContext('2d');
-            var frameImage = document.getElementById('frame_preview');
-            ctx.clearRect(0, 0, canvas.width, canvas.height); // Clear the canvas
-            ctx.drawImage(image, imageX, imageY, imageWidth, imageHeight); // Draw the image at the new position
-            ctx.drawImage(frameImage, 0, 0, canvas.width, canvas.height);
+            var userImageSrc = document.getElementById('user_image_preview').src;
+            if (userImageSrc) {
+                drawImageAndFrame(userImageSrc);
+            }
         });
     }
 });
@@ -209,8 +203,8 @@ document.getElementById('canvasId').addEventListener('mousedown', function(e) {
     var y = e.clientY - rect.top;
 
     isDragging = true;
-    dragStartX = x - imageX;
-    dragStartY = y - imageY;
+    dragStartX = x;
+    dragStartY = y;
 });
 
 
@@ -232,7 +226,7 @@ document.getElementById('canvasId').addEventListener('wheel', function(e) {
     var y = e.clientY - rect.top;
 
     // Calculate the new scale factor
-    var newScaleFactor = scaleFactor * Math.exp(e.deltaY / -500);
+    var newScaleFactor = scaleFactor * Math.exp(e.deltaY / -400);
 
     // Calculate the new image position
     var newX = x - (x - imageX) * (newScaleFactor / scaleFactor);
@@ -280,8 +274,7 @@ function createButtonDiv() {
     buttonDiv.style.justifyContent = 'center';
     buttonDiv.style.width = '100%';
     buttonDiv.style.gap = '2rem';
-    buttonDiv.style.position = 'absolute';
-    buttonDiv.style.bottom = '10px';
+    buttonDiv.style.position = 'relative';
 
     buttonDiv.appendChild(createDownloadButton());
     buttonDiv.appendChild(createResetButton());
@@ -292,8 +285,15 @@ function createButtonDiv() {
 // Function to create download button
 function createDownloadButton() {
     var downloadButton = document.createElement('button');
-    downloadButton.textContent = 'Download';
     downloadButton.type = 'button';
+
+    var downloadImage = document.createElement('img');
+    downloadImage.src = 'img/download.png'; // Set the image URL
+    downloadImage.style.marginRight = '5px'; // Add some space between the image and the text
+
+    downloadButton.appendChild(downloadImage);
+    downloadButton.appendChild(document.createTextNode('Download')); // Use createTextNode to add text
+
     downloadButton.onclick = function() {
         var userImageSrc = document.getElementById('user_image_preview').src;
         if (userImageSrc) {
@@ -306,35 +306,56 @@ function createDownloadButton() {
         link.download = 'download.png';
         link.click();
     };
+
     return downloadButton;
 }
 
 // Function to create reset button
 function createResetButton() {
     var resetButton = document.createElement('button');
-    resetButton.textContent = 'Reset';
     resetButton.type = 'button';
     resetButton.id = 'resetButtonId'; // Add this line to set the ID of the reset button
+
+    var resetImage = document.createElement('img');
+    resetImage.src = 'img/reset.png'; // Set the image URL
+    resetImage.style.marginRight = '5px'; // Add some space between the image and the text
+
+    resetButton.appendChild(resetImage);
+    resetButton.appendChild(document.createTextNode('Reset')); // Use createTextNode to add text
+
     resetButton.onclick = handleResetButtonClick; // Add the event listener here
+
     return resetButton;
+}
+
+// Map to store the preloaded frame images
+var frameImages = new Map();
+
+// Function to preload frame images
+function preloadFrameImages() {
+    var frameSelect = document.getElementById('frame');
+    for (var i = 0; i < frameSelect.options.length; i++) {
+        var frameImage = new Image();
+        frameImage.src = 'img/' + frameSelect.options[i].value;
+        frameImages.set(frameSelect.options[i].value, frameImage);
+    }
 }
 
 // Function to handle frame change
 function handleFrameChange() {
-    var frame = 'img/' + this.value;
-    document.getElementById('frame_preview').src = frame;
+    var frame = this.value;
 
-    var frameImage = new Image();
-    frameImage.onload = function() {
-        var userImageSrc = document.getElementById('user_image_preview').src;
-        if (!userImageSrc) {
-            return; // Return if the user image is not loaded
-        }
+    // Get the preloaded frame image
+    var frameImage = frameImages.get(frame);
+    document.getElementById('frame_preview').src = frameImage.src;
 
-        // Draw the user's image and the new frame on the canvas
-        drawImageAndFrame(userImageSrc);
-    };
-    frameImage.src = frame;
+    var userImageSrc = document.getElementById('user_image_preview').src;
+    if (!userImageSrc) {
+        return; // Return if the user image is not loaded
+    }
+
+    // Draw the user's image and the new frame on the canvas
+    loadImage(userImageSrc, imageX, imageY);
 }
 
 // Add event listeners

@@ -1,3 +1,9 @@
+@font-face {
+    font-family: 'Slowdex';
+    src: url('../font/slowdex/Slowdex.ttf') format('truetype');
+}
+
+
 body {
     font-family: Arial, sans-serif;
     margin: 0;
@@ -14,9 +20,9 @@ body {
     font-weight: 500;
 }
 header {
-    font-family: 'Pacifico', cursive;
+    font-family: 'Slowdex';
     text-align: center;
-    margin-bottom: 20px;
+    /* margin-bottom: 20px; */
     width: 100%; /* Take up full width */
     position: absolute; 
     top: 0; 
@@ -25,34 +31,60 @@ header {
 }
 /* ... rest of your CSS ... */
 header h1 {
-    font-size: 1.5em;
+    font-size: 2em;
     color: rgb(240, 243, 197);
 }
-span {
-    font-size: 3rem;
-}
+
 header .red {
-    color: red;
+    color: #007BFF; /* Vibrant Blue */
 }
+
 header .green {
-    color: green;
+    color: #343A40; /* Dark Gray */
 }
 .custom-file-upload {
+    display: flex;
+    align-items: center;
+    justify-content: center;
     padding: 10px;
     cursor: pointer;
     background: rgba(255, 255, 255, 0.1);
-    border: none;
-    border-radius: 15px;
-    color: #f6f60a;
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    color: white;
     font-weight: bold;
-    transition: background 0.3s ease;
+    transition: all 0.3s ease;
 }
 .custom-file-upload:hover {
-    background: rgb(244 239 1 / 23%);
+    background: rgba(255, 255, 255, 0.2);
 }
+
+
+.input-group {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    gap: 10px; /* Add gap */
+}
+
+.custom-file-upload:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.custom-file-upload .upload-text {
+    margin-left: 10px;
+    font-size: 16px; /* Adjust this value to match the size of your camera icon */
+    color: white; /* Set the color explicitly */
+}
+
 label {
     display: block;
     margin-bottom: 5px;
+    color: #fdfffe;
 }
 input[type="file"], select {
     margin-bottom: 10px;
@@ -63,16 +95,18 @@ select {
     padding: 10px;
     border-radius: 25px;
     border: none;
-    background: rgba(255, 255, 255, 0.2);
-    color: #090900;
+    background: linear-gradient(to right, rgba(0, 123, 255, 0.2), rgba(255, 65, 54, 0.2)); /* Semi-transparent gradient from blue to red */
+    backdrop-filter: blur(10px); /* Blur the background */
+    color: #fff; /* White color for the text */
     appearance: none;
     backdrop-filter: blur(10px);
     box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
     transition: background 0.3s ease; /* Add transition */
+    text-align: center;
 }
-select:hover {
-    background: rgb(244 239 1 / 23%); /* Change background on hover */
-}
+/* select:hover {
+    background: rgb(244 239 1 / 23%); 
+} */
 select option {
     background: rgba(255, 255, 255, 0.1);
     color: #000000;
@@ -92,7 +126,7 @@ select option {
     box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
     border: 1px solid rgba(255, 255, 255, 0.18);
     flex: 1; /* Add this line */
-    margin-top: 50px; /* Adjust this value as needed */
+    /* margin-top: 50px;  */
     /* margin-bottom: 50px;  */
     padding-bottom: 6rem;
 }
@@ -148,15 +182,6 @@ select option {
     height: 100%;
 }
 
-
-.input-group {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    width: 100%;
-    gap: 10px; /* Add gap */
-}
-
 #canvasId {
     position: absolute;
     top: 0;
@@ -167,6 +192,22 @@ select option {
     visibility: hidden;
     z-index: 9999; /* Increase the z-index to a higher value */
     border: none; /* Remove the border */
+}
+
+
+footer {
+    text-align: center;
+    padding: 5px;
+    background-color: rgba(77, 77, 77, 0.1); /* Semi-transparent white */
+    backdrop-filter: blur(5px); /* Blur the background */
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+    font-size: 10px;
+}
+
+footer p{
+    color: rgba(185, 197, 162, 0.244);
 }
 
 /* ... rest of your CSS ... */
@@ -250,46 +291,21 @@ select option {
 
 @media (max-width: 576px) {
     body {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    header {
-        left: 50%;
+        font-size: 18px; /* Increase the font size */
     }
 
     #frameForm {
-        /* height: 700px; Remove or comment out this line */
-        padding: 5px; 
-        min-width: 100vw; /* 100% of the viewport width */
-        max-height: 30vh;
+        width: 100%; /* Make the form take up the full width */
+        height: auto; /* Let the height adjust automatically */
+        padding: 10px; /* Reduce the padding */
     }
 
-    #preview {
-        width: 100%; 
-        height: 300px;
+    .input-group {
+        flex-direction: column; /* Stack the elements vertically */
     }
 
-    #user_image_preview, #frame_preview {
-        width: 100%; 
-        height: auto;
-    }
-    
-    #user_image_preview, #frame_preview {
-        position: absolute;
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        object-position: center;
-    }
-
-    #frame_preview {
-        width: 100%; 
-        height: 300px; 
-    }
-
-    select {
-        width: 100%; 
+    select, input[type="file"] {
+        width: 100%; /* Make the select and file input take up the full width */
     }
 }
 

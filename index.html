@@ -1,13 +1,17 @@
 <!DOCTYPE html>
 <html>
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>FrameGen</title>
     <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
     <header>
         <h1>
             <span class="red">Frame</span><span class="green">Gen</span> 
-            by microdrgz
+            <!-- by microdrgz -->
         </h1>
     </header>
 
@@ -41,11 +45,29 @@
             <!-- Upload your image: -->
             <label for="user_image" class="custom-file-upload">
                 <img src="img/camera-icon.png" alt="Upload">
+                <span class="upload-text">Choose a photo</span>
             </label>
             <input type="file" id="user_image" style="display: none;">
         </div>
     </form>
 
+
+    <footer>
+        <p>Copyright © 2024 Microdrgz. All rights reserved. Exclusive for LJCCC.</p>
+    </footer>
+
     <script src="js/javascript.js"></script>
+    <script src="js/mobilescript.js"></script>
+    <!-- <script>
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', function() {
+                navigator.serviceWorker.register('/service-worker.js').then(function(registration) {
+                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
+                }, function(err) {
+                    console.log('ServiceWorker registration failed: ', err);
+                });
+            });
+        }
+    </script> -->
 </body>
 </html>
