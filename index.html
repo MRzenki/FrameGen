@@ -52,22 +52,34 @@
     </form>
 
 
-    <footer>
+    <footer shine>
         <p>Copyright © 2024 Microdrgz. All rights reserved. Exclusive for LJCCC.</p>
     </footer>
 
     <script src="js/javascript.js"></script>
     <script src="js/mobilescript.js"></script>
-    <!-- <script>
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
-                navigator.serviceWorker.register('/service-worker.js').then(function(registration) {
-                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
-                }, function(err) {
-                    console.log('ServiceWorker registration failed: ', err);
-                });
-            });
-        }
-    </script> -->
+    <script>
+        window.addEventListener('scroll', function() {
+            if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
+                var footer = document.querySelector('footer');
+                footer.classList.remove('shine'); // Remove the class immediately
+                setTimeout(function() {
+                    footer.classList.add('shine'); // Add the class back after a delay
+                }, 100); // Short delay to ensure the class is removed before it's added back
+            }
+        });
+
+
+
+        // if ('serviceWorker' in navigator) {
+        //     window.addEventListener('load', function() {
+        //         navigator.serviceWorker.register('/service-worker.js').then(function(registration) {
+        //             console.log('ServiceWorker registration successful with scope: ', registration.scope);
+        //         }, function(err) {
+        //             console.log('ServiceWorker registration failed: ', err);
+        //         });
+        //     });
+        // }
+    </script>
 </body>
 </html>
