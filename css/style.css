@@ -35,14 +35,15 @@ header h1 {
     color: rgb(240, 243, 197);
     padding: 0;
     margin: 1rem auto;
+    user-select: none;
 }
 
 header .red {
-    color: #007BFF; /* Vibrant Blue */
+    color: #007bff; /* Vibrant Blue */
 }
 
 header .green {
-    color: #343A40; /* Dark Gray */
+    color: #343a40; /* Dark Gray */
 }
 .custom-file-upload {
     display: flex;
@@ -109,14 +110,14 @@ select:focus {
     outline: 2px solid transparent; /* Make the outline transparent */
     box-shadow: 0 0 0 2px rgba(206, 197, 30, 0.987); /* Add a yellow glow when focused */
     backdrop-filter: blur(10px);
-
 }
 /* select:hover {
     background: rgb(244 239 1 / 23%); 
 } */
 select option {
-    background: rgba(255, 255, 255, 0.1);
+    background: rgba(249, 6, 6, 0.1); /* Semi-transparent background */
     color: #000000;
+    backdrop-filter: blur(10px); /* Blur the background */
 }
 #frameForm {
     background: rgba(255, 255, 255, 0.1);

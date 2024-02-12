@@ -9,16 +9,15 @@
 
     <!-- Open Graph meta tags -->
     <meta property="og:title" content="FrameGen">
-    <meta property="og:description" content="Elevate your profile pictures to the next level">
+    <meta property="og:description" content="FrameGen is a versatile and user-friendly tool designed to elevate your profile pictures to the next level. With an intuitive interface, it empowers users to effortlessly create custom frames tailored to their preferences. Whether you're looking to add a touch of elegance, express your personality, or commemorate special occasions, FrameGen offers a wide range of stylish templates to suit every need. Elevate your online presence and make a lasting impression with FrameGen's seamless frame generation capabilities.">
     <meta property="og:image" content="https://github.com/MRzenki/FrameGen/blob/main/output/thumbnail.png">
     <meta property="og:url" content="https://mrzenki.github.io/FrameGen/">
     <meta property="og:type" content="website">
 </head>
 <body>
-    <header>
+    <header id="header">
         <h1>
             <span class="red">Frame</span><span class="green">Gen</span> 
-            <!-- by microdrgz -->
         </h1>
     </header>
 
@@ -63,6 +62,54 @@
         <p>Copyright © 2024 Microdrgz. All rights reserved. Exclusive for LJCCC.</p>
     </footer>
 
+    <script>
+        var header = document.getElementById('header');
+        var frameSelect = document.getElementById('frame');
+        var timer;
+        var newFrameAdded = false; // Add this line
+
+        function startTimer() {
+            timer = setTimeout(function() {
+                if (!newFrameAdded) { // Add this line
+                    var newOption = document.createElement('option');
+                    newOption.value = 'baby.png';
+                    newOption.textContent = 'Baby Kalma';
+                    frameSelect.appendChild(newOption);
+
+                    // Preload the new frame image
+                    var newFrameImage = new Image();
+                    newFrameImage.src = 'img/' + newOption.value;
+                    frameImages.set(newOption.value, newFrameImage);
+
+                    alert('Congratulations! You have unlocked a new frame option.');
+
+                    newFrameAdded = true; // Add this line
+                    removeEventListeners(); // Add this line
+                }
+            }, 3000); // 3000 milliseconds = 3 seconds
+        }
+
+        function clearTimer() {
+            clearTimeout(timer);
+        }
+
+        function removeEventListeners() { // Add this function
+            header.removeEventListener('mousedown', startTimer);
+            header.removeEventListener('mouseup', clearTimer);
+            header.removeEventListener('touchstart', startTimer);
+            header.removeEventListener('touchend', clearTimer);
+        }
+
+        // For desktop users
+        header.addEventListener('mousedown', startTimer);
+        header.addEventListener('mouseup', clearTimer);
+
+        // For mobile users
+        header.addEventListener('touchstart', startTimer);
+        header.addEventListener('touchend', clearTimer);
+    </script>
+
+
     <script src="js/mobilescript.js"></script>
     <script src="js/javascript.js"></script>
     <script>
@@ -86,6 +133,7 @@
         //         });
         //     });
         // }
+
 
         
     </script>
