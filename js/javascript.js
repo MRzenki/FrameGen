@@ -6,7 +6,9 @@ let ctxFrame = frameCanvas.getContext('2d');
 
 // Create new Image objects
 let userImage = new Image();
+userImage.crossOrigin = "anonymous"; // Add this line
 let frameImage = new Image();
+frameImage.crossOrigin = "anonymous"; // Add this line
 
 // Variables to store the current position and scale of the image
 let posX = 0;
@@ -30,7 +32,7 @@ function unlockHiddenFrame() {
     let frameSelect = document.getElementById('frame');
     let option = document.createElement('option');
     option.value = 'baby.png';
-    option.text = 'Secret Frame';
+    option.text = 'Scret Frame';
     frameSelect.add(option);
 }
 
@@ -82,15 +84,33 @@ document.getElementById('user_image').addEventListener('change', function(e) {
             ctxUser.clearRect(0, 0, userCanvas.width, userCanvas.height);
             ctxUser.drawImage(userImage, posX, posY, userImage.width * scale, userImage.height * scale);
 
+                // Check if the canvas is tainted
+                try {
+                    let dataUrl = userCanvas.toDataURL();
+                    console.log('Canvas is not tainted');
+                } catch (error) {
+                    if (error instanceof DOMException && error.name === 'SecurityError') {
+                        console.log('Canvas is tainted');
+                    } else {
+                        throw error;
+                    }
+                }
+
             // Change the cursor style after the image has been successfully loaded
             document.getElementById('userCanvas').style.cursor = 'move';
         }
         userImage.onerror = function() {
+            // Hide the spinner
+            document.getElementById('spinner').style.display = 'none';
+
             alert('Invalid image file. Please select a different file.');
         }
         userImage.src = event.target.result;
     }
     reader.onerror = function() {
+        // Hide the spinner
+        document.getElementById('spinner').style.display = 'none';
+
         alert('Error reading file. Please try again.');
     }
     reader.readAsDataURL(e.target.files[0]);
@@ -201,26 +221,6 @@ document.getElementById('user_image').addEventListener('change', function(e) {
 }, false);
 
 
-// let last_known_scroll_position = 0;
-// let ticking = false;
-
-// window.addEventListener('scroll', function(e) {
-//     last_known_scroll_position = window.scrollY;
-
-//     if (!ticking) {
-//         window.requestAnimationFrame(function() {
-//             if ((window.innerHeight + last_known_scroll_position) >= document.body.offsetHeight - 10) {
-//                 downloadButton.style.flexDirection = 'column';
-//             } else {
-//                 downloadButton.style.flexDirection = 'row';
-//             }
-//             ticking = false;
-//         });
-
-//         ticking = true;
-//     }
-// });
-
 // Create a recenter button
 let recenterButton = document.createElement('button');
 recenterButton.id = 'recenterButton'; // Add an id to the button for styling
@@ -260,3 +260,34 @@ recenterButton.style.display = 'none';
 document.getElementById('user_image').addEventListener('change', function(e) {
     recenterButton.style.display = 'flex';
 }, false);
+
+
+
+
+
+
+
+
+
+
+
+
+// let last_known_scroll_position = 0;
+// let ticking = false;
+
+// window.addEventListener('scroll', function(e) {
+//     last_known_scroll_position = window.scrollY;
+
+//     if (!ticking) {
+//         window.requestAnimationFrame(function() {
+//             if ((window.innerHeight + last_known_scroll_position) >= document.body.offsetHeight - 10) {
+//                 downloadButton.style.flexDirection = 'column';
+//             } else {
+//                 downloadButton.style.flexDirection = 'row';
+//             }
+//             ticking = false;
+//         });
+
+//         ticking = true;
+//     }
+// });

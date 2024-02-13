@@ -5,7 +5,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
     <title>FrameGen</title>
-    <link rel="stylesheet" href="css/style.css">
 
     <!-- Open Graph meta tags -->
     <meta property="og:title" content="FrameGen">
@@ -14,6 +13,12 @@
     <meta property="og:image" content="https://raw.githubusercontent.com/MRzenki/FrameGen/main/output/baby.png">
     <meta property="og:url" content="https://mrzenki.github.io/FrameGen/">
     <meta property="og:type" content="website">
+
+
+
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
+
 </head>
 <body>
     <header id="header">
@@ -22,6 +27,10 @@
         </h1>
     </header>
 
+        <div id="spinner" style="display: none;">
+            <img src="spinner.gif" alt="Loading...">
+        </div>
+        
     <form id="frameForm">
 
 
@@ -63,7 +72,6 @@
     </footer>
 
     <!-- <script src="js/mobilescript.js"></script> -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
     <script src="js/javascript.js"></script>
     <script>
         window.addEventListener('scroll', function() {
