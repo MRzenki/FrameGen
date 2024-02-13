@@ -1,0 +1,420 @@
+@font-face {
+    font-family: 'Slowdex';
+    src: url('../font/slowdex/Slowdex.ttf') format('truetype');
+}
+
+
+body {
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    background-image: url(../img/bg7.jpg);
+    background-size: cover;
+    background-position: center;
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-start;
+    align-items: center;
+    height: 100vh;
+    color: rgb(26, 26, 20);
+    font-weight: 500;
+}
+header {
+    font-family: 'Slowdex';
+    text-align: center;
+    /* margin-bottom: 20px; */
+    width: 100%; /* Take up full width */
+    position: absolute; 
+    top: 0; 
+    left: 15%; 
+    transform: translateX(-50%); 
+}
+/* ... rest of your CSS ... */
+header h1 {
+    font-size: 2em;
+    color: rgb(240, 243, 197);
+    padding: 0;
+    margin: 1rem auto;
+    user-select: none;
+}
+
+header .red {
+    color: #007bff; /* Vibrant Blue */
+}
+
+header .green {
+    color: #343a40; /* Dark Gray */
+}
+.custom-file-upload {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 7px;
+    cursor: pointer;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    box-shadow: 0 8px 32px 0 rgba(135, 36, 31, 0.37);
+    backdrop-filter: blur(4px);
+    -webkit-backdrop-filter: blur(4px);
+    color: white;
+    font-weight: bold;
+    transition: all 0.3s ease;
+}
+.custom-file-upload:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+
+.input-group {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    gap: 10px; /* Add gap */
+}
+
+.custom-file-upload:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.custom-file-upload .upload-text {
+    margin-left: 10px;
+    font-size: 16px; /* Adjust this value to match the size of your camera icon */
+    color: white; /* Set the color explicitly */
+}
+
+label {
+    display: block;
+    color: #fdfffe;
+}
+input[type="file"], select {
+    margin-bottom: 10px;
+}
+select {
+    font-weight: 600;
+    width: 70%;
+    padding: 10px;
+    border-radius: 25px;
+    border: none;
+    background: linear-gradient(to right, rgba(0, 123, 255, 0.4), rgba(255, 65, 54, 0.4)); /* Semi-transparent gradient from blue to red */
+    backdrop-filter: blur(10px); /* Blur the background */
+    color: #fff; /* White color for the text */
+    appearance: none;
+    backdrop-filter: blur(10px);
+    box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.37);
+    transition: background 0.3s ease; /* Add transition */
+    text-align: center;
+}
+select:focus {
+    outline: 2px solid transparent; /* Make the outline transparent */
+    box-shadow: 0 0 0 2px rgba(206, 197, 30, 0.987); /* Add a yellow glow when focused */
+    backdrop-filter: blur(10px);
+}
+/* select:hover {
+    background: rgb(244 239 1 / 23%); 
+} */
+select option {
+    background: rgba(249, 6, 6, 0.1); /* Semi-transparent background */
+    color: #000000;
+    backdrop-filter: blur(10px); /* Blur the background */
+}
+#frameForm {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    border-radius: 10px;
+    padding: 20px;
+    width: 400px; /* Decrease width */
+    max-height: 60vh; /* Decrease height */
+    min-width: 400px; 
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    align-items: center;
+    box-shadow: 0 8px 32px 0 rgba(240, 240, 1, 0.148);
+    border: 1px solid rgba(255, 255, 255, 0.18);
+    flex: 1; /* Add this line */
+    margin-top: 50px; 
+    /* margin-bottom: 50px;  */
+    padding-bottom: 6rem;
+}
+#frameForm button {
+    color: #05ad2c;
+    font-weight: bold;
+}
+#frameForm button {
+    background: rgba(255, 255, 255, 0.1);
+    border: none;
+    padding: 15px 30px; /* Increase size */
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background 0.3s ease;
+    color: #94f3a5; /* Change color */
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.3); /* Add box shadow */
+    margin-top: auto; /* Position at bottom */
+}
+#frameForm button:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+#preview {
+    position: relative;
+    width: 100%;
+    padding-top: 100%;
+    max-height: 350px;
+    /* background: rgba(255, 255, 255, 0.1); */
+    box-shadow: 5px 5px 15px rgba(0, 0, 0, 0.2), -5px -5px 15px rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    cursor: pointer;
+    /* margin: auto;  */
+}
+
+#preview::before {
+    content: "";
+    position: absolute;
+    top: -3px;
+    left: -3px;
+    right: -3px;
+    bottom: -3px;
+    border: 3px dashed rgba(255, 255, 255, 0.698);
+    /* border-image: url("data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyNyAyNyIgd2lkdGg9IjI3IiBoZWlnaHQ9IjI3Ij48cmVjdCB4PSIwIiB5PSIwIiB3aWR0aD0iMTAwJSIgaGVpZ2h0PSIxMDAlIiBmaWxsPSJub25lIiBzdHJva2U9Im5vbmUiLz48cGF0aCBzaGFwZS1yZW5kZXJpbmc9ImNyaXNwRWRnZXMiIGQ9Ik0gMCAwIEwgNiAwIDYgMyAzIDMgMyA2IDAgNiBaIiBmaWxsPSJyZWQiIHN0cm9rZT0ibm9uZSIvPjxwYXRoICBzaGFwZS1yZW5kZXJpbmc9ImNyaXNwRWRnZXMiIGQ9Ik0gMCAyMSBMIDAgMjcgNiAyNyA2IDI0IDMgMjQgMyAyMSBaIiBmaWxsPSJyZWQiIHN0cm9rZT0ibm9uZSIvPjxwYXRoIHNocGFwZS1yZW5kZXJpbmc9ImNyaXNwRWRnZXMiIGQ9Ik0gMjcgMjEgTCAyNyAyNyAyMSAyNyAyMSAyNCAyNCAyNCAyNCAyMSBaIiBmaWxsPSJyZWQiIHN0cm9rZT0ibm9uZSIvPjxwYXRoIHNocGFwZS1yZW5kZXJpbmc9ImNyaXNwRWRnZXMiIGQ9Ik0gMjEgMCBMIDI3IDAgMjcgNiAyNCA2IDI0IDMgMjEgMyBaIiBmaWxsPSJyZWQiIHN0cm9rZT0ibm9uZSIvPjwvc3ZnPgo=") 6 / 8px / 10px round; */
+    backdrop-filter: blur(10px);
+    opacity: 0.5;
+}
+
+#preview > img {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+}
+
+#user_image_preview, #frame_preview {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: cover; /* Updated */
+    object-position: center; /* Updated */
+    z-index: 1; /* Updated */
+}
+
+#frame_preview {
+    z-index: 2;
+}
+
+#canvasId {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    visibility: hidden;
+    z-index: 3; /* Increase the z-index to a higher value */
+    border: none; /* Remove the border */
+}
+
+footer {
+    text-align: center;
+    padding: 5px;
+    background-color: rgba(77, 77, 77, 0.1); /* Semi-transparent white */
+    backdrop-filter: blur(5px); /* Blur the background */
+    position: fixed;
+    width: 100%;
+    bottom: 0;
+    font-size: 10px;
+}
+
+footer p{
+    color: rgba(185, 197, 162, 0.3);
+}
+
+/* ... rest of your CSS ... */
+
+
+/* Media query for tablets devices */
+
+@media (max-width: 1300px) {
+    #frameForm {
+        width: auto;
+        max-height: 60vh;
+        margin-top: 0;
+    }
+
+    header {
+        position: static; /* Reset position */
+        top: auto; /* Reset top */
+        left: auto; /* Reset left */
+        transform: none; /* Reset transform */
+    }
+}
+
+
+@media (max-width: 1024px) {
+    body {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    header {
+        position: static; /* Reset position */
+        top: auto; /* Reset top */
+        left: auto; /* Reset left */
+        transform: none; /* Reset transform */
+    }
+}
+
+@media (max-width: 1300px) {
+    #frameForm {
+        width: auto;
+        margin-top: 0;
+
+    }
+
+    header {
+        left: 50%;
+    }
+}
+
+@media (max-width: 790px) {
+    #frameForm {
+        min-width: 300px; /* Adjust this value as needed */
+        /* height: auto; Remove or comment out this line */
+        max-height: 50vh;
+    }
+}
+/* 
+@media (max-width: 768px) {
+    body {
+        flex-direction: column;
+        align-items: center;
+    }
+
+
+
+    header {
+        left: auto;
+    }
+
+    #preview {
+        width: 100%; 
+        height: auto;
+    }
+
+    #user_image_preview, #frame_preview {
+        width: 100%; 
+        height: auto; 
+    }
+
+    select {
+        width: 100%; 
+    }
+}
+*/
+@media (max-width: 576px) {
+    body {
+        font-size: 18px; 
+        flex-direction: column;
+        align-items: center;
+    }
+    #preview{
+        width: 95%;
+    }
+
+    /* #frameForm {
+        width: 80%; 
+        height: auto; 
+        _padding: 10px; 
+    } */
+    #frameForm {
+        min-width: 50%; 
+        max-height: 52vh;
+    }
+
+    .input-group {
+        flex-direction: column; 
+    }
+
+    select, input[type="file"] {
+        width: 100%; 
+    }
+    
+}
+
+@media (max-width: 480px) {
+    body {
+        flex-direction: column;
+        align-items: center;
+    }
+
+    header {
+        left: 50%;
+    }
+
+    #frameForm {
+        width: 85%; 
+        height: auto; 
+        /* height: 700px; Remove or comment out this line */
+        /* padding: 5px; */
+    }
+
+    .input-group {
+        flex-direction: column; 
+    }
+    
+    #preview {
+        width: 100%;
+        height: 50vh; /* Adjust this value as needed */
+    }
+
+    #user_image_preview, #frame_preview {
+        width: 100%; 
+        height: 500px; 
+    }
+
+    select {
+        width: 100%; 
+    }
+} 
+
+
+@keyframes shine {
+    0% {
+        background-position: -100%;
+    }
+    50% {
+        background-position: 100%;
+    }
+    100% {
+        background-position: -100%;
+    }
+}
+
+@keyframes textShine {
+    0%, 100% {
+        background-position: 100%;
+    }
+    50% {
+        background-position: 0%;
+    }
+}
+
+footer p {
+    color: rgba(185, 197, 162, 0.3);
+    background: linear-gradient(90deg, rgba(185, 197, 162, 0.3), rgba(255, 255, 255, 1), rgba(185, 197, 162, 0.2));
+    background-size: 500%;
+    background-clip: text;
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: textShine 3s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+}
+
+.shine {
+    animation: shine 1s cubic-bezier(0.22, 0.61, 0.36, 1) forwards;
+    background: linear-gradient(90deg, rgba(255, 255, 255, 0), rgba(255, 255, 255, 0.5), rgba(255, 255, 255, 0));
+    background-size: 200%;
+    background-repeat: no-repeat;
+}

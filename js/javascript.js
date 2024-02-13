@@ -1,375 +1,262 @@
-// Variables to store the drag state and position
-var isDragging = false;
-var dragStartX = 0;
-var dragStartY = 0;
-var imageX = 0;
-var imageY = 0;
-var imageWidth = 0;
-var imageHeight = 0;
-var canvas = document.getElementById('canvasId');
-var image = new Image(); // Move the image object to the global scope
-var frameSelect = document.getElementById('frame');
+// Get the canvas and context
+let userCanvas = document.getElementById('userCanvas');
+let frameCanvas = document.getElementById('frameCanvas');
+let ctxUser = userCanvas.getContext('2d');
+let ctxFrame = frameCanvas.getContext('2d');
 
-document.getElementById('canvasId').style.cursor = 'move';
+// Create new Image objects
+let userImage = new Image();
+let frameImage = new Image();
 
-// Call the function when the page loads
-window.onload = function() {
-    preloadFrameImages();
-    setInitialFrame();
-};
+// Variables to store the current position and scale of the image
+let posX = 0;
+let posY = 0;
+let scale = 1;
 
-// drawImageAndFrame For PC
-function drawImageAndFrame() {
-    var canvas = document.getElementById('canvasId');
-    var ctx = canvas.getContext('2d');
-    var frameImage = document.getElementById('frame_preview');
+// Get the header element
+let header = document.getElementById('header');
 
-    ctx.clearRect(0, 0, canvas.width, canvas.height);
-    ctx.save();
-    ctx.translate(translate.x + imageWidth / 2, translate.y + imageHeight / 2); // Translate to the center of the image
-    ctx.rotate(rotation); // Apply the rotation
-    ctx.scale(scaleFactor, scaleFactor);
-    ctx.drawImage(offscreenCanvas, -imageWidth / 2, -imageHeight / 2, imageWidth, imageHeight); // Draw the image at the center
-    ctx.restore();
-    ctx.drawImage(frameImage, 0, 0, canvas.width, canvas.height);
+// Create a new instance of Hammer on the header
+let hammerHeader = new Hammer(header);
+
+// Set the press event options
+hammerHeader.get('press').set({ time: 2000 }); // 2 seconds
+
+// Function to unlock the hidden frame
+function unlockHiddenFrame() {
+    alert('Congratulations! You have unlocked a new frame option.');
+
+    // Add the hidden frame to the list of frames
+    let frameSelect = document.getElementById('frame');
+    let option = document.createElement('option');
+    option.value = 'baby.png';
+    option.text = 'Secret Frame';
+    frameSelect.add(option);
 }
 
-// Add event listeners
-document.getElementById('user_image').addEventListener('change', handleUserImageChange);
-document.getElementById('frame').addEventListener('change', handleFrameChange);
+// Variable to store the timer
+let timer;
 
-// Add an event listener to the frame select element
-frameSelect.addEventListener('change', function() {
-    // Get the user's image
-    var userImage = document.getElementById('user_image_preview').src;
-    // Load the user's image and the new frame on the canvas
-    loadImage(userImage);
-});
-
-// Function to set initial frame
-function setInitialFrame() {
-    if (frameSelect.options.length > 0) {
-        frameSelect.selectedIndex = 0; // Select the first option
-        frameSelect.dispatchEvent(new Event('change')); // Trigger the change event
-    }
-}
-
-// Function to handle user image selection
-function handleUserImageChange() {
-    var userFile = this.files[0];
-
-    if (userFile) {
-        var reader = new FileReader();
-        reader.onload = function(e) {
-            // Display the user's image in the preview div
-            displayUserImage(e.target.result);
-
-            // Load the user's image and the frame on the canvas
-            loadImage(e.target.result);
-
-            setInitialFrame();
-            replaceButtons();
-
-            // Show the canvas and hide the user's image in the preview div
-            document.getElementById('canvasId').style.visibility = 'visible';
-            document.getElementById('user_image_preview').style.display = 'none';
-        };
-        reader.readAsDataURL(userFile);
-    } else {
-        alert('Please select a file before downloading.');
-    }
-}
-
-// Map to store the preloaded frame images
-var frameImages = new Map();
-
-// Function to preload frame images
-function preloadFrameImages() {
-    for (var i = 0; i < frameSelect.options.length; i++) {
-        var frameImage = new Image();
-        frameImage.src = 'img/' + frameSelect.options[i].value;
-        frameImages.set(frameSelect.options[i].value, frameImage);
-    }
-}
-
-// Function to handle frame change
-function handleFrameChange() {
-    var frame = this.value;
-
-    // Get the preloaded frame image
-    var frameImage = frameImages.get(frame);
-    document.getElementById('frame_preview').src = frameImage.src;
-
-    var userImageSrc = document.getElementById('user_image_preview').src;
-    if (!userImageSrc) {
-        return; // Return if the user image is not loaded
-    }
-
-    // Draw the user's image and the new frame on the canvas
-    loadImage(userImageSrc);
-}
-
-// Function to display user's image
-function displayUserImage(imageSrc) {
-    document.getElementById('user_image_preview').src = imageSrc;
-}
-
-var scaleFactor = 1; // Initialize the scale factor
-var offscreenCanvas = document.createElement('canvas');
-var offscreenCtx = offscreenCanvas.getContext('2d');
-
-function loadImage(imageSrc) {
-    var canvas = document.getElementById('canvasId');
-    var ctx = canvas.getContext('2d');
-    var frameImage = document.getElementById('frame_preview');
-
-    // Set the canvas dimensions before loading the image
-    canvas.width = 1080;
-    canvas.height = 1080;
-
-    image.onload = function() {
-        var scaleX = 1080 / image.width * scaleFactor; // Use the scaleFactor variable
-        var scaleY = 1080 / image.height * scaleFactor; // Use the scaleFactor variable
-        var scale = Math.max(scaleX, scaleY);
-
-        imageWidth = image.width * scale; // Update the global variable
-        imageHeight = image.height * scale; // Update the global variable
-
-        // Calculate the center of the canvas
-        var centerX = canvas.width / 2;
-        var centerY = canvas.height / 2;
-
-        // Adjust the position of the image so it's centered
-        imageX = translate.x || centerX - imageWidth / 2;
-        imageY = translate.y || centerY - imageHeight / 2;
-
-        // Draw the image onto the offscreen canvas
-        offscreenCanvas.width = imageWidth;
-        offscreenCanvas.height = imageHeight;
-        offscreenCtx.clearRect(0, 0, offscreenCanvas.width, offscreenCanvas.height);
-        offscreenCtx.drawImage(image, 0, 0, imageWidth, imageHeight);
-
-        // Draw the offscreen canvas onto the main canvas
-        ctx.clearRect(0, 0, canvas.width, canvas.height);
-        ctx.drawImage(offscreenCanvas, imageX, imageY, imageWidth, imageHeight);
-        ctx.drawImage(frameImage, 0, 0, canvas.width, canvas.height);
-    };
-    image.src = imageSrc; // Set the src after defining the onload function
-}
-
-
-document.getElementById('canvasId').addEventListener('mousemove', function(e) {
-    var rect = this.getBoundingClientRect();
-    var x = e.clientX - rect.left;
-    var y = e.clientY - rect.top;
-
-    if (isDragging) {
-        var dx = (x - dragStartX) / scaleFactor;
-        var dy = (y - dragStartY) / scaleFactor;
-        translate.x += dx;
-        translate.y += dy;
-        dragStartX = x;
-        dragStartY = y;
-
-        // Use requestAnimationFrame to make the movement smoother
-        requestAnimationFrame(function() {
-            var userImageSrc = document.getElementById('user_image_preview').src;
-            if (userImageSrc) {
-                drawImageAndFrame(userImageSrc);
-            }
-        });
+// Start the timer when the user presses the mouse button
+header.addEventListener('mousedown', function(e) {
+    // Check if the pointer type is mouse
+    if (e.pointerType === 'mouse') {
+        timer = setTimeout(unlockHiddenFrame, 2000); // 2 seconds
     }
 });
 
-document.getElementById('canvasId').addEventListener('mousedown', function(e) {
-    var rect = this.getBoundingClientRect();
-    var x = e.clientX - rect.left;
-    var y = e.clientY - rect.top;
-
-    isDragging = true;
-    dragStartX = x;
-    dragStartY = y;
-});
-
-
-document.getElementById('canvasId').addEventListener('mouseup', function(e) {
-    isDragging = false;
-
-    var userImageSrc = document.getElementById('user_image_preview').src;
-    if (userImageSrc) {
-        drawImageAndFrame(userImageSrc);
+// Cancel the timer when the user releases the mouse button
+header.addEventListener('mouseup', function(e) {
+    // Check if the pointer type is mouse
+    if (e.pointerType === 'mouse') {
+        clearTimeout(timer);
     }
 });
 
-// Add a 'wheel' event listener to handle zooming
-document.getElementById('canvasId').addEventListener('wheel', function(e) {
-    e.preventDefault();
+// Listen for the press event
+hammerHeader.on('press', unlockHiddenFrame);
 
-    var rect = this.getBoundingClientRect();
-    var x = e.clientX - rect.left;
-    var y = e.clientY - rect.top;
+// Set the size of the canvas to match the size of the frameCanvas
+userCanvas.width = 1080; // Set the width to 1080
+userCanvas.height = 1080; // Set the height to 1080
+frameCanvas.width = 1080; // Set the width to 1080
+frameCanvas.height = 1080; // Set the height to 1080
 
-    // Calculate the new scale factor
-    var newScaleFactor = scaleFactor * Math.exp(e.deltaY / -400);
+// Load an image when the user selects a file
+document.getElementById('user_image').addEventListener('change', function(e) {
+    let reader = new FileReader();
+    reader.onload = function(event) {
+        userImage.onload = function() {
+            // Calculate the correct dimensions for the image to preserve its aspect ratio
+            let aspectRatio = userImage.width / userImage.height;
+            let newWidth = frameCanvas.width; // Set the new width to the width of the frame canvas
+            let newHeight = newWidth / aspectRatio; // Calculate the new height based on the aspect ratio
+        
+            // Calculate an initial scale based on the ratio of the canvas width to the image width
+            scale = frameCanvas.width / userImage.width;
+        
+            // Calculate initial posX and posY values to center the image on the canvas
+            posX = (frameCanvas.width - newWidth) / 2;
+            posY = (frameCanvas.height - newHeight) / 2;
+        
+            ctxUser.clearRect(0, 0, userCanvas.width, userCanvas.height);
+            ctxUser.drawImage(userImage, posX, posY, userImage.width * scale, userImage.height * scale);
 
-    // Calculate the new image position
-    var newX = x - (x - imageX) * (newScaleFactor / scaleFactor);
-    var newY = y - (y - imageY) * (newScaleFactor / scaleFactor);
-
-    // Update the scale factor and image position
-    scaleFactor = newScaleFactor;
-    imageX = newX;
-    imageY = newY;
-
-    // Redraw the image with the new scale factor and position
-    var userImageSrc = document.getElementById('user_image_preview').src;
-    if (userImageSrc) {
-        drawImageAndFrame(userImageSrc);
-    }
-});
-
-
-
-// ------------------ -------------------- this is the border --------------- -------------------
-
-
-// Function to replace buttons
-function replaceButtons() {
-    var form = document.getElementById('frameForm');
-    var buttonDiv = createButtonDiv();
-
-    var existingButtonDiv = document.getElementById('buttonDiv');
-    if (existingButtonDiv) {
-        form.removeChild(existingButtonDiv);
-    }
-
-    form.appendChild(buttonDiv);
-}
-
-// Function to create button div
-function createButtonDiv() {
-    var buttonDiv = document.createElement('div');
-    buttonDiv.id = 'buttonDiv';
-    buttonDiv.style.display = 'flex';
-    buttonDiv.style.justifyContent = 'center';
-    buttonDiv.style.width = '100%';
-    buttonDiv.style.gap = '2rem';
-    buttonDiv.style.position = 'relative';
-    buttonDiv.style.marginTop = '20px'; // Add a margin to the top of the buttonDiv
-
-    buttonDiv.appendChild(createDownloadButton());
-    buttonDiv.appendChild(createResetButton());
-
-    return buttonDiv;
-}
-
-// Function to create download button
-function createDownloadButton() {
-    var downloadButton = document.createElement('button');
-    downloadButton.type = 'button';
-    downloadButton.style.fontSize = '10px'; // Adjust the font size of the button text
-    downloadButton.style.display = 'flex'; // Make the button a flex container
-    downloadButton.style.flexDirection = 'column'; // Stack the icon and text vertically
-    downloadButton.style.width = '60px'; // Set the width of the button
-    downloadButton.style.height = '60px'; // Set the height of the button
-    downloadButton.style.alignItems = 'center'; // Center the contents of the button
-    downloadButton.style.justifyContent = 'center'; // Center the contents of the button
-
-    var downloadImage = document.createElement('img');
-    downloadImage.src = 'img/download.png'; // Set the image URL
-    downloadImage.style.width = '30px'; // Adjust the width of the image
-    downloadImage.style.height = '30px'; // Adjust the height of the image
-
-    downloadButton.appendChild(downloadImage);
-    downloadButton.appendChild(document.createTextNode('Download')); // Use createTextNode to add text
-
-    downloadButton.onclick = function() {
-        var userImageSrc = document.getElementById('user_image_preview').src;
-        if (userImageSrc) {
-            drawImageAndFrame(userImageSrc);
+            // Change the cursor style after the image has been successfully loaded
+            document.getElementById('userCanvas').style.cursor = 'move';
         }
-
-        var link = document.createElement('a');
-        var canvas = document.getElementById('canvasId');
-        link.href = canvas.toDataURL('image/png');
-        link.download = 'download.png';
-        link.click();
-    };
-
-    return downloadButton;
-}
-
-// Function to create reset button
-function createResetButton() {
-    var resetButton = document.createElement('button');
-    resetButton.type = 'button';
-    resetButton.style.fontSize = '10px'; // Adjust the font size of the button text
-    resetButton.id = 'resetButtonId'; // Set the ID of the reset button
-    resetButton.style.width = '60px'; // Set the width of the button
-    resetButton.style.height = '60px'; // Set the height of the button
-    resetButton.style.display = 'flex'; // Make the button a flex container
-    resetButton.style.flexDirection = 'column'; // Stack the icon and text vertically
-    resetButton.style.alignItems = 'center'; // Center the contents of the button
-    resetButton.style.justifyContent = 'center'; // Center the contents of the button
-
-    var resetImage = document.createElement('img');
-    resetImage.src = 'img/reset.png'; // Set the image URL
-    resetImage.style.width = '30px'; // Adjust the width of the image
-    resetImage.style.height = '30px'; // Adjust the height of the image
-
-    resetButton.appendChild(resetImage);
-    resetButton.appendChild(document.createTextNode('Recenter')); // Use createTextNode to add text
-
-    resetButton.onclick = handleResetButtonClick; // Add the event listener here
-
-    return resetButton;
-}
-
-// Function to handle reset button click
-function handleResetButtonClick() {
-    // Reset the scale factor and translation
-    scaleFactor = 1;
-    translate = { x: 0, y: 0 };
-
-    // Redraw the image with the initial scale factor and position
-    var userImageSrc = document.getElementById('user_image_preview').src;
-    if (userImageSrc) {
-        var canvas = document.getElementById('canvasId');
-        var image = new Image();
-        image.onload = function() {
-            var scaleX = 1080 / image.width * scaleFactor;
-            var scaleY = 1080 / image.height * scaleFactor;
-            var scale = Math.max(scaleX, scaleY);
-
-            imageWidth = image.width * scale;
-            imageHeight = image.height * scale;
-
-            // Calculate the center of the canvas
-            var centerX = canvas.width / 2;
-            var centerY = canvas.height / 2;
-
-            // Adjust the position of the image so it's centered
-            imageX = centerX - imageWidth / 2;
-            imageY = centerY - imageHeight / 2;
-
-            drawImageAndFrame(userImageSrc); // Call drawImageAndFrame instead of loadImage
-        };
-        image.src = userImageSrc;
+        userImage.onerror = function() {
+            alert('Invalid image file. Please select a different file.');
+        }
+        userImage.src = event.target.result;
     }
-
-    // Reset the form
-    // document.getElementById('frameForm').reset();
-
-    // Display the user's image in the preview div
-    displayUserImage(userImageSrc);
-}
-
-document.addEventListener('DOMContentLoaded', function() {
-    // Add an event listener to the reset button
-    var resetButton = document.getElementById('resetButtonId');
-    if (resetButton) {
-        resetButton.addEventListener('click', handleResetButtonClick);
-    } else {
-        console.error('Reset button not found');
+    reader.onerror = function() {
+        alert('Error reading file. Please try again.');
     }
+    reader.readAsDataURL(e.target.files[0]);
+}, false);
+
+// Load a frame when the user selects a frame
+let frameSelect = document.getElementById('frame');
+frameSelect.addEventListener('change', function(e) {
+    frameImage.onload = function() {
+        // Calculate the correct height for the image to preserve its aspect ratio
+        let aspectRatio = frameImage.width / frameImage.height;
+        let newHeight = frameCanvas.width / aspectRatio;
+
+        ctxFrame.clearRect(0, 0, frameCanvas.width, frameCanvas.height);
+        ctxFrame.drawImage(frameImage, 0, 0, frameCanvas.width, newHeight);
+    }
+    frameImage.src = 'img/' + e.target.value;
+}, false);
+
+// Trigger the 'change' event to load the first frame
+let event = new Event('change');
+frameSelect.dispatchEvent(event);
+
+// Use Hammer.js to add pinch, zoom, and pan functionality
+let hammer = new Hammer(userCanvas);
+hammer.get('pinch').set({ enable: true });
+hammer.get('pan').set({ enable: true });
+
+let initialScale = 1;
+hammer.on('pinchstart', function(e) {
+    initialScale = scale;
 });
+
+hammer.on('pinchmove', function(e) {
+    // Scale the image based on the pinch gesture
+    scale = initialScale * e.scale;
+    ctxUser.clearRect(0, 0, userCanvas.width, userCanvas.height);
+    ctxUser.drawImage(userImage, posX, posY, userImage.width * scale, userImage.height * scale);
+});
+
+let initialPosX = 0;
+let initialPosY = 0;
+hammer.on('panstart', function(e) {
+    initialPosX = posX;
+    initialPosY = posY;
+});
+
+hammer.on('panmove', function(e) {
+    // Move the image based on the pan gesture
+    posX = initialPosX + e.deltaX;
+    posY = initialPosY + e.deltaY;
+    ctxUser.clearRect(0, 0, userCanvas.width, userCanvas.height);
+    ctxUser.drawImage(userImage, posX, posY, userImage.width * scale, userImage.height * scale);
+});
+
+// ----------------- Add the following code to the end of the javascript.js file -----------------
+
+// Create a download button
+let downloadButton = document.createElement('button');
+downloadButton.id = 'downloadButton'; // Add an id to the button for styling
+
+// Create an img element for the button icon
+let buttonIcon = document.createElement('img');
+buttonIcon.src = 'img/download.png'; // Set the source of the img
+buttonIcon.alt = 'Download'; // Set the alt text of the img
+
+// Append the img to the button
+downloadButton.appendChild(buttonIcon);
+
+// Create a text node and append it to the button
+let buttonText = document.createTextNode(' Download');
+downloadButton.appendChild(buttonText);
+
+// Add an event listener to the download button
+downloadButton.addEventListener('click', function() {
+    // Create a new canvas to combine the user image and the frame
+    let combinedCanvas = document.createElement('canvas');
+    combinedCanvas.width = userCanvas.width;
+    combinedCanvas.height = userCanvas.height;
+    let ctxCombined = combinedCanvas.getContext('2d');
+
+    // Draw the user image and the frame on the new canvas
+    ctxCombined.drawImage(userCanvas, 0, 0);
+    ctxCombined.drawImage(frameCanvas, 0, 0);
+
+    // Create a new anchor element
+    let link = document.createElement('a');
+
+    // Set the href of the anchor element to the data URL of the new canvas
+    link.href = combinedCanvas.toDataURL('image/png');
+
+    // Set the download attribute of the anchor element
+    link.download = 'edited-frame.png';
+
+    // Simulate a click on the anchor element
+    link.click();
+});
+
+// Append the download button to the body of the document
+document.body.appendChild(downloadButton);
+
+// Initially hide the download button
+downloadButton.style.display = 'none';
+
+// Show the download button when the user selects an image
+document.getElementById('user_image').addEventListener('change', function(e) {
+    downloadButton.style.display = 'flex';
+}, false);
+
+
+// let last_known_scroll_position = 0;
+// let ticking = false;
+
+// window.addEventListener('scroll', function(e) {
+//     last_known_scroll_position = window.scrollY;
+
+//     if (!ticking) {
+//         window.requestAnimationFrame(function() {
+//             if ((window.innerHeight + last_known_scroll_position) >= document.body.offsetHeight - 10) {
+//                 downloadButton.style.flexDirection = 'column';
+//             } else {
+//                 downloadButton.style.flexDirection = 'row';
+//             }
+//             ticking = false;
+//         });
+
+//         ticking = true;
+//     }
+// });
+
+// Create a recenter button
+let recenterButton = document.createElement('button');
+recenterButton.id = 'recenterButton'; // Add an id to the button for styling
+
+// Create an img element and set its src attribute to the path of your image
+let recenterButtonIcon = document.createElement('img');
+recenterButtonIcon.src = 'img/reset.png';
+
+// Append the img element to the button
+recenterButton.appendChild(recenterButtonIcon);
+
+// Add an event listener to the recenter button
+recenterButton.addEventListener('click', function() {
+    // Calculate the correct dimensions for the image to preserve its aspect ratio
+    let aspectRatio = userImage.width / userImage.height;
+    let newWidth = frameCanvas.width; // Set the new width to the width of the frame canvas
+    let newHeight = newWidth / aspectRatio; // Calculate the new height based on the aspect ratio
+
+    // Calculate an initial scale based on the ratio of the canvas width to the image width
+    scale = frameCanvas.width / userImage.width;
+
+    // Calculate initial posX and posY values to center the image on the canvas
+    posX = (frameCanvas.width - newWidth) / 2;
+    posY = (frameCanvas.height - newHeight) / 2;
+
+    ctxUser.clearRect(0, 0, userCanvas.width, userCanvas.height);
+    ctxUser.drawImage(userImage, posX, posY, userImage.width * scale, userImage.height * scale);
+});
+
+// Append the recenter button to the body of the document
+document.body.appendChild(recenterButton);
+
+// Initially hide the recenter button
+recenterButton.style.display = 'none';
+
+// Show the recenter button when the user selects an image
+document.getElementById('user_image').addEventListener('change', function(e) {
+    recenterButton.style.display = 'flex';
+}, false);

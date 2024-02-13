@@ -4,22 +4,31 @@ var translate = { x: 0, y: 0 };
 var initialAngle = 0;
 var scaleFactor = 1;
 var rotation = 0;
+// Variable to store the current frame
+var currentFrame = document.getElementById('frame_preview');
+
 
 // drawImageAndFrame For Mobile
-function drawImageAndFrame() {
+function drawImageAndFrame(newX, newY) {
     var canvas = document.getElementById('canvasId');
     var ctx = canvas.getContext('2d');
     var frameImage = document.getElementById('frame_preview');
+    var userImage = document.getElementById('user_image_preview'); // Assuming this is the image you want to draw
+
+    // Update the image position
+    translate.x = newX || translate.x;
+    translate.y = newY || translate.y;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.save();
     ctx.translate(translate.x, translate.y);
     // ctx.rotate(rotation); //TENTATIVE - ROTATE
     ctx.scale(scaleFactor, scaleFactor);
-    ctx.drawImage(offscreenCanvas, 0, 0, imageWidth, imageHeight); // Draw the image at (0, 0)
+    ctx.drawImage(userImage, 0, 0, userImage.width, userImage.height); // Draw the image at the new position
     ctx.restore();
     ctx.drawImage(frameImage, 0, 0, canvas.width, canvas.height);
 }
+
 
 // Function to handle user image selection
 function handleImageUpload(e) {
@@ -39,12 +48,14 @@ function handleImageUpload(e) {
             // Load the user's image and the frame on the canvas
             loadImage(e.target.result);
 
-            setInitialFrame();
             replaceButtons();
 
             // Show the canvas and hide the user's image in the preview div
             document.getElementById('canvasId').style.visibility = 'visible';
             document.getElementById('user_image_preview').style.display = 'none';
+
+            // Redraw the current frame
+            ctx.drawImage(currentFrame, 0, 0, canvas.width, canvas.height);
         };
         reader.readAsDataURL(userFile);
     } else {
@@ -52,8 +63,13 @@ function handleImageUpload(e) {
     }
 }
 // Add an event listener to the file input element
-document.getElementById('user_image').addEventListener('change', handleImageUpload);
-
+if (window.matchMedia("(min-width: 768px)").matches) {
+    // The viewport is at least 768 pixels wide, which is typical for a desktop device
+    document.getElementById('user_image').addEventListener('change', handleUserImageChange);
+} else {
+    // The viewport is less than 768 pixels wide, which is typical for a mobile device
+    document.getElementById('user_image').addEventListener('change', handleImageUpload);
+}
 
 document.getElementById('canvasId').addEventListener('touchstart', function(e) {
     var rect = e.target.getBoundingClientRect();
@@ -94,17 +110,28 @@ document.getElementById('canvasId').addEventListener('touchmove', function(e) {
         var newDistance = getDistanceBetweenTouches(e);
         var scaleFactorChange = newDistance / initialDistance;
 
-        // Only update scaleFactor if the change in distance is greater than a threshold
+        // Add these two lines at the top of your script
+        var minScaleFactor = 0.1; // Minimum zoom level
+        var maxScaleFactor = 10;  // Maximum zoom level
+
+        // Modify this part of your touchmove event listener
         if (Math.abs(1 - scaleFactorChange) > 0.02) { // Increase the threshold to make pinch-to-zoom less sensitive
             initialDistance = newDistance;
             scaleFactor *= Math.sqrt(scaleFactorChange); // Apply square root to slow down zooming
+
+            // Add these lines to limit the scaleFactor
+            if (scaleFactor < minScaleFactor) {
+                scaleFactor = minScaleFactor;
+            } else if (scaleFactor > maxScaleFactor) {
+                scaleFactor = maxScaleFactor;
+            }
         }
 
         var newPosition = getMidpointBetweenTouches(e);
-        var dx = scaleFactor * (newPosition.x - initialPosition.x + translate.x / scaleFactor);
-        var dy = scaleFactor * (newPosition.y - initialPosition.y + translate.y / scaleFactor);
-        translate.x = dx;
-        translate.y = dy;
+        var dx = newPosition.x - initialPosition.x;
+        var dy = newPosition.y - initialPosition.y;
+        translate.x += dx;
+        translate.y += dy;
         imageX += dx / scaleFactor;
         imageY += dy / scaleFactor;
 
@@ -114,7 +141,7 @@ document.getElementById('canvasId').addEventListener('touchmove', function(e) {
     var userImageSrc = document.getElementById('user_image_preview').src;
     if (userImageSrc) {
         requestAnimationFrame(function() {
-            drawImageAndFrame(userImageSrc);
+            drawImageAndFrame(translate.x, translate.y); // Pass the new position of the image
         });
     }
 }, { passive: false });
@@ -140,3 +167,4 @@ function getTouchPosition(e) {
         y: touch.clientY - rect.top
     };
 }
+

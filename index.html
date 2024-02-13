@@ -25,8 +25,8 @@
     <form id="frameForm">
 
 
-        <div class="input-group">
-            <label for="frame">Select frame:</label>
+        <div class="input-group1">
+            <label for="frame">Select Frame:</label>
             <select id="frame">
                 <option value="frame8.png">In Love</option> 
                 <option value="frame7.png">Blessed</option> 
@@ -42,14 +42,12 @@
         </div>
         
         <div id="preview">
-            <img id="user_image_preview">
-            <img id="frame_preview">
-            <!-- Move the canvas here -->
-            <canvas id="canvasId" style="visibility: hidden; border: 1px solid black;"></canvas>
+            <canvas id="userCanvas" style="position: absolute;"></canvas>
+            <canvas id="frameCanvas" style="position: absolute;"></canvas>
         </div>
 
         
-        <div class="input-group" id="upload_button">
+        <div class="input-group2" id="upload_button">
             <!-- Upload your image: -->
             <label for="user_image" class="custom-file-upload">
                 <img src="img/camera-icon.png" alt="Upload">
@@ -64,55 +62,8 @@
         <p>Copyright © 2024 Microdrgz. All rights reserved. Exclusive for LJCCC.</p>
     </footer>
 
-    <script>
-        var header = document.getElementById('header');
-        var frameSelect = document.getElementById('frame');
-        var timer;
-        var newFrameAdded = false; // Add this line
-
-        function startTimer() {
-            timer = setTimeout(function() {
-                if (!newFrameAdded) { // Add this line
-                    var newOption = document.createElement('option');
-                    newOption.value = 'baby.png';
-                    newOption.textContent = 'Baby Kalma';
-                    frameSelect.appendChild(newOption);
-
-                    // Preload the new frame image
-                    var newFrameImage = new Image();
-                    newFrameImage.src = 'img/' + newOption.value;
-                    frameImages.set(newOption.value, newFrameImage);
-
-                    alert('Congratulations! You have unlocked a new frame option.');
-
-                    newFrameAdded = true; // Add this line
-                    removeEventListeners(); // Add this line
-                }
-            }, 3000); // 3000 milliseconds = 3 seconds
-        }
-
-        function clearTimer() {
-            clearTimeout(timer);
-        }
-
-        function removeEventListeners() { // Add this function
-            header.removeEventListener('mousedown', startTimer);
-            header.removeEventListener('mouseup', clearTimer);
-            header.removeEventListener('touchstart', startTimer);
-            header.removeEventListener('touchend', clearTimer);
-        }
-
-        // For desktop users
-        header.addEventListener('mousedown', startTimer);
-        header.addEventListener('mouseup', clearTimer);
-
-        // For mobile users
-        header.addEventListener('touchstart', startTimer);
-        header.addEventListener('touchend', clearTimer);
-    </script>
-
-
-    <script src="js/mobilescript.js"></script>
+    <!-- <script src="js/mobilescript.js"></script> -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/hammer.js/2.0.8/hammer.min.js"></script>
     <script src="js/javascript.js"></script>
     <script>
         window.addEventListener('scroll', function() {
@@ -125,19 +76,7 @@
             }
         });
 
-
-        // if ('serviceWorker' in navigator) {
-        //     window.addEventListener('load', function() {
-        //         navigator.serviceWorker.register('/service-worker.js').then(function(registration) {
-        //             console.log('ServiceWorker registration successful with scope: ', registration.scope);
-        //         }, function(err) {
-        //             console.log('ServiceWorker registration failed: ', err);
-        //         });
-        //     });
-        // }
-
-
-        
+      
     </script>
 </body>
 </html>
