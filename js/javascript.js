@@ -18,14 +18,11 @@ window.onload = function() {
     setInitialFrame();
 };
 
-function drawImageAndFrame(newX, newY) {
+// drawImageAndFrame For PC
+function drawImageAndFrame() {
     var canvas = document.getElementById('canvasId');
     var ctx = canvas.getContext('2d');
     var frameImage = document.getElementById('frame_preview');
-
-    // Update the image position
-    translate.x = newX || translate.x;
-    translate.y = newY || translate.y;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.save();
@@ -70,8 +67,7 @@ function handleUserImageChange() {
             // Load the user's image and the frame on the canvas
             loadImage(e.target.result);
 
-            // Comment out the line below to prevent the frame from being reset
-            // setInitialFrame();
+            setInitialFrame();
             replaceButtons();
 
             // Show the canvas and hide the user's image in the preview div
@@ -126,7 +122,6 @@ function loadImage(imageSrc) {
     var canvas = document.getElementById('canvasId');
     var ctx = canvas.getContext('2d');
     var frameImage = document.getElementById('frame_preview');
-    var image = new Image(); // Create a new Image object
 
     // Set the canvas dimensions before loading the image
     canvas.width = 1080;
@@ -164,23 +159,24 @@ function loadImage(imageSrc) {
 
 
 document.getElementById('canvasId').addEventListener('mousemove', function(e) {
-    if (isDragging) {
-        var rect = this.getBoundingClientRect();
-        var x = e.clientX - rect.left;
-        var y = e.clientY - rect.top;
+    var rect = this.getBoundingClientRect();
+    var x = e.clientX - rect.left;
+    var y = e.clientY - rect.top;
 
+    if (isDragging) {
         var dx = (x - dragStartX) / scaleFactor;
         var dy = (y - dragStartY) / scaleFactor;
-        imageX += dx;
-        imageY += dy;
-
-        // Update the start position for the next move event
+        translate.x += dx;
+        translate.y += dy;
         dragStartX = x;
         dragStartY = y;
 
         // Use requestAnimationFrame to make the movement smoother
         requestAnimationFrame(function() {
-            drawImageAndFrame(imageX, imageY);
+            var userImageSrc = document.getElementById('user_image_preview').src;
+            if (userImageSrc) {
+                drawImageAndFrame(userImageSrc);
+            }
         });
     }
 });
@@ -198,10 +194,11 @@ document.getElementById('canvasId').addEventListener('mousedown', function(e) {
 
 document.getElementById('canvasId').addEventListener('mouseup', function(e) {
     isDragging = false;
-});
 
-document.getElementById('canvasId').addEventListener('mouseout', function(e) {
-    isDragging = false;
+    var userImageSrc = document.getElementById('user_image_preview').src;
+    if (userImageSrc) {
+        drawImageAndFrame(userImageSrc);
+    }
 });
 
 // Add a 'wheel' event listener to handle zooming
@@ -213,11 +210,11 @@ document.getElementById('canvasId').addEventListener('wheel', function(e) {
     var y = e.clientY - rect.top;
 
     // Calculate the new scale factor
-    var newScaleFactor = scaleFactor * Math.exp(e.deltaY / -800); // Reduced zoom sensitivity
+    var newScaleFactor = scaleFactor * Math.exp(e.deltaY / -400);
 
     // Calculate the new image position
-    var newX = imageX - (x - imageX) * (newScaleFactor - scaleFactor);
-    var newY = imageY - (y - imageY) * (newScaleFactor - scaleFactor);
+    var newX = x - (x - imageX) * (newScaleFactor / scaleFactor);
+    var newY = y - (y - imageY) * (newScaleFactor / scaleFactor);
 
     // Update the scale factor and image position
     scaleFactor = newScaleFactor;
@@ -227,9 +224,10 @@ document.getElementById('canvasId').addEventListener('wheel', function(e) {
     // Redraw the image with the new scale factor and position
     var userImageSrc = document.getElementById('user_image_preview').src;
     if (userImageSrc) {
-        drawImageAndFrame(imageX, imageY); // Pass the new position of the image
+        drawImageAndFrame(userImageSrc);
     }
 });
+
 
 
 // ------------------ -------------------- this is the border --------------- -------------------
@@ -354,10 +352,7 @@ function handleResetButtonClick() {
             imageX = centerX - imageWidth / 2;
             imageY = centerY - imageHeight / 2;
 
-            // Update the translate object with the new position
-            translate = { x: imageX, y: imageY };
-
-            drawImageAndFrame(translate.x, translate.y); // Call drawImageAndFrame instead of loadImage
+            drawImageAndFrame(userImageSrc); // Call drawImageAndFrame instead of loadImage
         };
         image.src = userImageSrc;
     }
