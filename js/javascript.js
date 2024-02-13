@@ -126,6 +126,7 @@ function loadImage(imageSrc) {
     var canvas = document.getElementById('canvasId');
     var ctx = canvas.getContext('2d');
     var frameImage = document.getElementById('frame_preview');
+    var image = new Image(); // Create a new Image object
 
     // Set the canvas dimensions before loading the image
     canvas.width = 1080;
@@ -163,24 +164,23 @@ function loadImage(imageSrc) {
 
 
 document.getElementById('canvasId').addEventListener('mousemove', function(e) {
-    var rect = this.getBoundingClientRect();
-    var x = e.clientX - rect.left;
-    var y = e.clientY - rect.top;
-
     if (isDragging) {
+        var rect = this.getBoundingClientRect();
+        var x = e.clientX - rect.left;
+        var y = e.clientY - rect.top;
+
         var dx = (x - dragStartX) / scaleFactor;
         var dy = (y - dragStartY) / scaleFactor;
-        var newX = imageX + dx;
-        var newY = imageY + dy;
+        imageX += dx;
+        imageY += dy;
+
+        // Update the start position for the next move event
         dragStartX = x;
         dragStartY = y;
 
         // Use requestAnimationFrame to make the movement smoother
         requestAnimationFrame(function() {
-            var userImageSrc = document.getElementById('user_image_preview').src;
-            if (userImageSrc) {
-                drawImageAndFrame(userImageSrc, newX, newY);
-            }
+            drawImageAndFrame(imageX, imageY);
         });
     }
 });
@@ -198,11 +198,10 @@ document.getElementById('canvasId').addEventListener('mousedown', function(e) {
 
 document.getElementById('canvasId').addEventListener('mouseup', function(e) {
     isDragging = false;
+});
 
-    var userImageSrc = document.getElementById('user_image_preview').src;
-    if (userImageSrc) {
-        drawImageAndFrame(userImageSrc);
-    }
+document.getElementById('canvasId').addEventListener('mouseout', function(e) {
+    isDragging = false;
 });
 
 // Add a 'wheel' event listener to handle zooming
@@ -214,11 +213,11 @@ document.getElementById('canvasId').addEventListener('wheel', function(e) {
     var y = e.clientY - rect.top;
 
     // Calculate the new scale factor
-    var newScaleFactor = scaleFactor * Math.exp(e.deltaY / -400);
+    var newScaleFactor = scaleFactor * Math.exp(e.deltaY / -800); // Reduced zoom sensitivity
 
     // Calculate the new image position
-    var newX = imageX - (x - imageX) * (newScaleFactor / scaleFactor);
-    var newY = imageY - (y - imageY) * (newScaleFactor / scaleFactor);
+    var newX = imageX - (x - imageX) * (newScaleFactor - scaleFactor);
+    var newY = imageY - (y - imageY) * (newScaleFactor - scaleFactor);
 
     // Update the scale factor and image position
     scaleFactor = newScaleFactor;
@@ -228,10 +227,9 @@ document.getElementById('canvasId').addEventListener('wheel', function(e) {
     // Redraw the image with the new scale factor and position
     var userImageSrc = document.getElementById('user_image_preview').src;
     if (userImageSrc) {
-        drawImageAndFrame(userImageSrc, newX, newY);
+        drawImageAndFrame(imageX, imageY); // Pass the new position of the image
     }
 });
-
 
 
 // ------------------ -------------------- this is the border --------------- -------------------

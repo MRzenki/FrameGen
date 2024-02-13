@@ -105,10 +105,21 @@ document.getElementById('canvasId').addEventListener('touchmove', function(e) {
         var newDistance = getDistanceBetweenTouches(e);
         var scaleFactorChange = newDistance / initialDistance;
 
-        // Only update scaleFactor if the change in distance is greater than a threshold
+        // Add these two lines at the top of your script
+        var minScaleFactor = 0.1; // Minimum zoom level
+        var maxScaleFactor = 10;  // Maximum zoom level
+
+        // Modify this part of your touchmove event listener
         if (Math.abs(1 - scaleFactorChange) > 0.02) { // Increase the threshold to make pinch-to-zoom less sensitive
             initialDistance = newDistance;
             scaleFactor *= Math.sqrt(scaleFactorChange); // Apply square root to slow down zooming
+
+            // Add these lines to limit the scaleFactor
+            if (scaleFactor < minScaleFactor) {
+                scaleFactor = minScaleFactor;
+            } else if (scaleFactor > maxScaleFactor) {
+                scaleFactor = maxScaleFactor;
+            }
         }
 
         var newPosition = getMidpointBetweenTouches(e);
