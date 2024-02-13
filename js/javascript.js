@@ -18,11 +18,14 @@ window.onload = function() {
     setInitialFrame();
 };
 
-// drawImageAndFrame For PC
-function drawImageAndFrame() {
+function drawImageAndFrame(newX, newY) {
     var canvas = document.getElementById('canvasId');
     var ctx = canvas.getContext('2d');
     var frameImage = document.getElementById('frame_preview');
+
+    // Update the image position
+    translate.x = newX || translate.x;
+    translate.y = newY || translate.y;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.save();
@@ -67,7 +70,8 @@ function handleUserImageChange() {
             // Load the user's image and the frame on the canvas
             loadImage(e.target.result);
 
-            setInitialFrame();
+            // Comment out the line below to prevent the frame from being reset
+            // setInitialFrame();
             replaceButtons();
 
             // Show the canvas and hide the user's image in the preview div
@@ -166,8 +170,8 @@ document.getElementById('canvasId').addEventListener('mousemove', function(e) {
     if (isDragging) {
         var dx = (x - dragStartX) / scaleFactor;
         var dy = (y - dragStartY) / scaleFactor;
-        translate.x += dx;
-        translate.y += dy;
+        var newX = imageX + dx;
+        var newY = imageY + dy;
         dragStartX = x;
         dragStartY = y;
 
@@ -175,7 +179,7 @@ document.getElementById('canvasId').addEventListener('mousemove', function(e) {
         requestAnimationFrame(function() {
             var userImageSrc = document.getElementById('user_image_preview').src;
             if (userImageSrc) {
-                drawImageAndFrame(userImageSrc);
+                drawImageAndFrame(userImageSrc, newX, newY);
             }
         });
     }
@@ -213,8 +217,8 @@ document.getElementById('canvasId').addEventListener('wheel', function(e) {
     var newScaleFactor = scaleFactor * Math.exp(e.deltaY / -400);
 
     // Calculate the new image position
-    var newX = x - (x - imageX) * (newScaleFactor / scaleFactor);
-    var newY = y - (y - imageY) * (newScaleFactor / scaleFactor);
+    var newX = imageX - (x - imageX) * (newScaleFactor / scaleFactor);
+    var newY = imageY - (y - imageY) * (newScaleFactor / scaleFactor);
 
     // Update the scale factor and image position
     scaleFactor = newScaleFactor;
@@ -224,7 +228,7 @@ document.getElementById('canvasId').addEventListener('wheel', function(e) {
     // Redraw the image with the new scale factor and position
     var userImageSrc = document.getElementById('user_image_preview').src;
     if (userImageSrc) {
-        drawImageAndFrame(userImageSrc);
+        drawImageAndFrame(userImageSrc, newX, newY);
     }
 });
 
@@ -352,7 +356,10 @@ function handleResetButtonClick() {
             imageX = centerX - imageWidth / 2;
             imageY = centerY - imageHeight / 2;
 
-            drawImageAndFrame(userImageSrc); // Call drawImageAndFrame instead of loadImage
+            // Update the translate object with the new position
+            translate = { x: imageX, y: imageY };
+
+            drawImageAndFrame(translate.x, translate.y); // Call drawImageAndFrame instead of loadImage
         };
         image.src = userImageSrc;
     }

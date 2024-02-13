@@ -4,22 +4,31 @@ var translate = { x: 0, y: 0 };
 var initialAngle = 0;
 var scaleFactor = 1;
 var rotation = 0;
+// Variable to store the current frame
+var currentFrame = document.getElementById('frame_preview');
+
 
 // drawImageAndFrame For Mobile
-function drawImageAndFrame() {
+function drawImageAndFrame(newX, newY) {
     var canvas = document.getElementById('canvasId');
     var ctx = canvas.getContext('2d');
     var frameImage = document.getElementById('frame_preview');
+    var userImage = document.getElementById('user_image_preview'); // Assuming this is the image you want to draw
+
+    // Update the image position
+    translate.x = newX || translate.x;
+    translate.y = newY || translate.y;
 
     ctx.clearRect(0, 0, canvas.width, canvas.height);
     ctx.save();
     ctx.translate(translate.x, translate.y);
     // ctx.rotate(rotation); //TENTATIVE - ROTATE
     ctx.scale(scaleFactor, scaleFactor);
-    ctx.drawImage(offscreenCanvas, 0, 0, imageWidth, imageHeight); // Draw the image at (0, 0)
+    ctx.drawImage(userImage, 0, 0, userImage.width, userImage.height); // Draw the image at the new position
     ctx.restore();
     ctx.drawImage(frameImage, 0, 0, canvas.width, canvas.height);
 }
+
 
 // Function to handle user image selection
 function handleImageUpload(e) {
@@ -39,12 +48,14 @@ function handleImageUpload(e) {
             // Load the user's image and the frame on the canvas
             loadImage(e.target.result);
 
-            setInitialFrame();
             replaceButtons();
 
             // Show the canvas and hide the user's image in the preview div
             document.getElementById('canvasId').style.visibility = 'visible';
             document.getElementById('user_image_preview').style.display = 'none';
+
+            // Redraw the current frame
+            ctx.drawImage(currentFrame, 0, 0, canvas.width, canvas.height);
         };
         reader.readAsDataURL(userFile);
     } else {
@@ -101,10 +112,10 @@ document.getElementById('canvasId').addEventListener('touchmove', function(e) {
         }
 
         var newPosition = getMidpointBetweenTouches(e);
-        var dx = scaleFactor * (newPosition.x - initialPosition.x + translate.x / scaleFactor);
-        var dy = scaleFactor * (newPosition.y - initialPosition.y + translate.y / scaleFactor);
-        translate.x = dx;
-        translate.y = dy;
+        var dx = newPosition.x - initialPosition.x;
+        var dy = newPosition.y - initialPosition.y;
+        translate.x += dx;
+        translate.y += dy;
         imageX += dx / scaleFactor;
         imageY += dy / scaleFactor;
 
@@ -114,7 +125,7 @@ document.getElementById('canvasId').addEventListener('touchmove', function(e) {
     var userImageSrc = document.getElementById('user_image_preview').src;
     if (userImageSrc) {
         requestAnimationFrame(function() {
-            drawImageAndFrame(userImageSrc);
+            drawImageAndFrame(translate.x, translate.y); // Pass the new position of the image
         });
     }
 }, { passive: false });
