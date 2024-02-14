@@ -1,3 +1,23 @@
+// PRELOADING IMAGES
+let preloadedFrames = {};
+let frameNames = ['frame1.png', 'frame2.png', 'frame3.png', 'frame4.png', 'frame5.png', 'frame6.png', 'frame7.png', 'frame8.png', 'frame9.png', 'baby.png'];
+
+frameNames.forEach(function(frameName, index) {
+    let img = new Image();
+    img.onload = function() {
+        preloadedFrames[frameName] = img;
+
+        // If this is the last image, dispatch the 'change' event
+        if (index === frameNames.length - 1) {
+            let event = new Event('change');
+            frameSelect.dispatchEvent(event);
+        }
+    }
+    img.src = 'img/' + frameName;
+});
+
+// Rest of your code...
+
 // Get the canvas and context
 let userCanvas = document.getElementById('userCanvas');
 let frameCanvas = document.getElementById('frameCanvas');
@@ -9,11 +29,6 @@ let userImage = new Image();
 userImage.crossOrigin = "anonymous"; // Add this line
 let frameImage = new Image();
 frameImage.crossOrigin = "anonymous"; // Add this line
-
-// Variables to store the current position and scale of the image
-let posX = 0;
-let posY = 0;
-let scale = 1;
 
 // Get the header element
 let header = document.getElementById('header');
@@ -32,7 +47,7 @@ function unlockHiddenFrame() {
     let frameSelect = document.getElementById('frame');
     let option = document.createElement('option');
     option.value = 'baby.png';
-    option.text = 'Scret Frame';
+    option.text = 'Secret Frame';
     frameSelect.add(option);
 }
 
@@ -67,6 +82,10 @@ frameCanvas.height = 1080; // Set the height to 1080
 // Load an image when the user selects a file
 document.getElementById('user_image').addEventListener('change', function(e) {
     let reader = new FileReader();
+
+    // Show the spinner
+    document.getElementById('spinner').style.display = 'block';
+    
     reader.onload = function(event) {
         userImage.onload = function() {
             // Calculate the correct dimensions for the image to preserve its aspect ratio
@@ -119,54 +138,112 @@ document.getElementById('user_image').addEventListener('change', function(e) {
 // Load a frame when the user selects a frame
 let frameSelect = document.getElementById('frame');
 frameSelect.addEventListener('change', function(e) {
-    frameImage.onload = function() {
+    let selectedFrame = preloadedFrames[e.target.value];
+    if (selectedFrame) {
         // Calculate the correct height for the image to preserve its aspect ratio
-        let aspectRatio = frameImage.width / frameImage.height;
+        let aspectRatio = selectedFrame.width / selectedFrame.height;
         let newHeight = frameCanvas.width / aspectRatio;
 
         ctxFrame.clearRect(0, 0, frameCanvas.width, frameCanvas.height);
-        ctxFrame.drawImage(frameImage, 0, 0, frameCanvas.width, newHeight);
+        ctxFrame.drawImage(selectedFrame, 0, 0, frameCanvas.width, newHeight);
+    } else {
+        console.error('Frame not found: ' + e.target.value);
     }
-    frameImage.src = 'img/' + e.target.value;
 }, false);
 
 // Trigger the 'change' event to load the first frame
 let event = new Event('change');
 frameSelect.dispatchEvent(event);
 
+// ------------------------------------ HAMMER.JS CODE ------------------------------------ //
+
 // Use Hammer.js to add pinch, zoom, and pan functionality
 let hammer = new Hammer(userCanvas);
 hammer.get('pinch').set({ enable: true });
 hammer.get('pan').set({ enable: true });
 
+// Variables to store the current position and scale of the image
+let posX = 0;
+let posY = 0;
+let scale = 1;
+
 let initialScale = 1;
-hammer.on('pinchstart', function(e) {
-    initialScale = scale;
-});
-
-hammer.on('pinchmove', function(e) {
-    // Scale the image based on the pinch gesture
-    scale = initialScale * e.scale;
-    ctxUser.clearRect(0, 0, userCanvas.width, userCanvas.height);
-    ctxUser.drawImage(userImage, posX, posY, userImage.width * scale, userImage.height * scale);
-});
-
 let initialPosX = 0;
 let initialPosY = 0;
-hammer.on('panstart', function(e) {
-    initialPosX = posX;
-    initialPosY = posY;
+
+hammer.on('hammer.input', function(e) {
+    if (e.isFirst) {
+        initialScale = scale;
+        initialPosX = posX;
+        initialPosY = posY;
+    }
 });
 
-hammer.on('panmove', function(e) {
-    // Move the image based on the pan gesture
-    posX = initialPosX + e.deltaX;
-    posY = initialPosY + e.deltaY;
+let moveFactor = 8; // Increase this value to increase the sensitivity of the pinch gesture for moving the image
+let panMoveFactor = 4; // Increase this value to increase the sensitivity of the pan gesture for moving the image
+
+hammer.on('transform', function(e) {
+    // Scale the image based on the pinch gesture
+    if (e.pointers.length > 1) {
+        scale = initialScale * e.scale;
+    }
+
+    // Move the image based on the pinch or pan gesture
+    posX = initialPosX + (e.deltaX * ((e.pointers.length > 1) ? scale * moveFactor : panMoveFactor));
+    posY = initialPosY + (e.deltaY * ((e.pointers.length > 1) ? scale * moveFactor : panMoveFactor));
+
     ctxUser.clearRect(0, 0, userCanvas.width, userCanvas.height);
     ctxUser.drawImage(userImage, posX, posY, userImage.width * scale, userImage.height * scale);
 });
 
+hammer.on('panmove pinchmove', function(e) {
+    // Scale the image based on the pinch gesture
+    if (e.type === 'pinchmove') {
+        scale = initialScale * e.scale;
+    }
+
+    // Move the image based on the pinch or pan gesture
+    posX = initialPosX + (e.deltaX * ((e.type === 'pinchmove') ? scale * moveFactor : panMoveFactor));
+    posY = initialPosY + (e.deltaY * ((e.type === 'pinchmove') ? scale * moveFactor : panMoveFactor));
+
+    ctxUser.clearRect(0, 0, userCanvas.width, userCanvas.height);
+    ctxUser.drawImage(userImage, posX, posY, userImage.width * scale, userImage.height * scale);
+});
+
+
+// Listen for the wheel event on the user's canvas
+userCanvas.addEventListener('wheel', function(e) {
+    // Prevent the default behavior of the wheel event
+    e.preventDefault();
+
+    // Determine the direction of the wheel rotation
+    let direction = e.deltaY < 0 ? 1 : -1;
+
+    // Calculate the new scale
+    let newScale = scale + direction * 0.1;
+
+    // Ensure that the scale is within a certain range
+    if (newScale < 0.1) {
+        newScale = 0.1;
+    } else if (newScale > 3.0) {
+        newScale = 3.0;
+    }
+
+    // Update the scale
+    scale = newScale;
+
+    // Clear the canvas
+    ctxUser.clearRect(0, 0, userCanvas.width, userCanvas.height);
+
+    // Draw the image with the new scale
+    ctxUser.drawImage(userImage, posX, posY, userImage.width * scale, userImage.height * scale);
+}, false);
+
+
+
 // ----------------- Add the following code to the end of the javascript.js file -----------------
+
+
 
 // Create a download button
 let downloadButton = document.createElement('button');

@@ -227,6 +227,11 @@ footer p{
     #recenterButton {
         bottom: 90px;
     }
+    select {
+        width: 100%;
+    }
+
+
 }
 
 /* Styles for mobile devices */
@@ -252,6 +257,7 @@ footer p{
         left: auto; /* Reset the left positioning */
         transform: none; /* Reset the transform */
     }
+
 }
 
 @keyframes shine {
