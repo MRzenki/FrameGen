@@ -1,22 +1,29 @@
 // PRELOADING IMAGES
 let preloadedFrames = {};
-let frameNames = ['frame1.png', 'frame2.png', 'frame3.png', 'frame4.png', 'frame5.png', 'frame6.png', 'frame7.png', 'frame8.png', 'frame9.png', 'baby.png'];
+let frameNames = ['SO INLOVE', 'BLESSED', 'SINGLE & BLESSED', 'STUDY FIRST', 'WAITING FOR GOD\'S WILL', 'FAITHFULL COMMITTED', 'IT\'S COMPLICATED', 'MOVING FORWARD', 'PUT GOD FIRST'];
+let frameFiles = ['frame8.png', 'frame7.png', 'frame1.png', 'frame6.png', 'frame2.png', 'frame3.png', 'frame5.png', 'frame4.png', 'frame9.png', 'baby.png'];
 
-frameNames.forEach(function(frameName, index) {
+frameFiles.forEach(function(frameFile, index) {
     let img = new Image();
     img.onload = function() {
-        preloadedFrames[frameName] = img;
+        preloadedFrames[frameFile] = img;
 
-        // If this is the last image, dispatch the 'change' event
-        if (index === frameNames.length - 1) {
+        // If this is the last image, populate the select element and dispatch the 'change' event
+        if (index === frameFiles.length - 1) {
+            let frameSelect = document.getElementById('frame');
+            frameNames.forEach(function(name, index) {
+                let option = document.createElement('option');
+                option.value = frameFiles[index];
+                option.text = name;
+                frameSelect.add(option);
+            });
+
             let event = new Event('change');
             frameSelect.dispatchEvent(event);
         }
     }
-    img.src = 'img/' + frameName;
+    img.src = 'img/' + frameFile;
 });
-
-// Rest of your code...
 
 // Get the canvas and context
 let userCanvas = document.getElementById('userCanvas');
@@ -32,23 +39,38 @@ frameImage.crossOrigin = "anonymous"; // Add this line
 
 // Get the header element
 let header = document.getElementById('header');
-
 // Create a new instance of Hammer on the header
 let hammerHeader = new Hammer(header);
 
 // Set the press event options
 hammerHeader.get('press').set({ time: 2000 }); // 2 seconds
 
+
+// Variable to store whether the secret frame has been unlocked
+let isFrameUnlocked = false;
+
 // Function to unlock the hidden frame
 function unlockHiddenFrame() {
+    // Check if the frame has already been unlocked
+    if (isFrameUnlocked) {
+        alert('You have already unlocked the secret frame.');
+        return;
+    }
+
     alert('Congratulations! You have unlocked a new frame option.');
 
     // Add the hidden frame to the list of frames
     let frameSelect = document.getElementById('frame');
+    let secretGroup = document.createElement('optgroup');
+    secretGroup.label = '--- Secret Frame ---';
     let option = document.createElement('option');
     option.value = 'baby.png';
-    option.text = 'Secret Frame';
-    frameSelect.add(option);
+    option.text = 'BABY, KALMA';
+    secretGroup.appendChild(option);
+    frameSelect.appendChild(secretGroup);
+
+    // Set the frame as unlocked
+    isFrameUnlocked = true;
 }
 
 // Variable to store the timer
@@ -103,17 +125,20 @@ document.getElementById('user_image').addEventListener('change', function(e) {
             ctxUser.clearRect(0, 0, userCanvas.width, userCanvas.height);
             ctxUser.drawImage(userImage, posX, posY, userImage.width * scale, userImage.height * scale);
 
-                // Check if the canvas is tainted
-                try {
-                    let dataUrl = userCanvas.toDataURL();
-                    console.log('Canvas is not tainted');
-                } catch (error) {
-                    if (error instanceof DOMException && error.name === 'SecurityError') {
-                        console.log('Canvas is tainted');
-                    } else {
-                        throw error;
-                    }
+            // Check if the canvas is tainted
+            try {
+                let dataUrl = userCanvas.toDataURL();
+                console.log('Canvas is not tainted');
+            } catch (error) {
+                if (error instanceof DOMException && error.name === 'SecurityError') {
+                    console.log('Canvas is tainted');
+                } else {
+                    throw error;
                 }
+            }
+
+            // Add the dashed border
+            previewWrapper.classList.add('dashed-border'); // <-- Change this line
 
             // Change the cursor style after the image has been successfully loaded
             document.getElementById('userCanvas').style.cursor = 'move';
@@ -135,17 +160,50 @@ document.getElementById('user_image').addEventListener('change', function(e) {
     reader.readAsDataURL(e.target.files[0]);
 }, false);
 
+frameCanvas.addEventListener('transitionend', function(e) {
+    // Check if the transition that ended is an opacity transition
+    if (e.propertyName === 'opacity') {
+        // If isMoving is false, ensure that the opacity is reset to 1.0
+        if (!isMoving) {
+            frameCanvas.style.opacity = 1.0;
+        }
+    }
+});
+
+let isFirstLoad = true;
 // Load a frame when the user selects a frame
 let frameSelect = document.getElementById('frame');
 frameSelect.addEventListener('change', function(e) {
     let selectedFrame = preloadedFrames[e.target.value];
     if (selectedFrame) {
+        // Update frameImage
+        frameImage = selectedFrame;
+
         // Calculate the correct height for the image to preserve its aspect ratio
         let aspectRatio = selectedFrame.width / selectedFrame.height;
         let newHeight = frameCanvas.width / aspectRatio;
 
-        ctxFrame.clearRect(0, 0, frameCanvas.width, frameCanvas.height);
-        ctxFrame.drawImage(selectedFrame, 0, 0, frameCanvas.width, newHeight);
+        if (isFirstLoad) {
+            // Bounce and fade out the frameCanvas
+            frameCanvas.style.transform = 'scale(1.2)';
+            frameCanvas.style.opacity = 0;
+            
+            // Wait for the transition to finish
+            setTimeout(function() {
+                ctxFrame.clearRect(0, 0, frameCanvas.width, frameCanvas.height);
+                ctxFrame.drawImage(frameImage, 0, 0, frameCanvas.width, newHeight);
+            
+                // Return the frameCanvas to its original size and fade in
+                frameCanvas.style.transform = 'scale(1)';
+                frameCanvas.style.opacity = 1;
+            
+                // Set isFirstLoad to false after the first load
+                isFirstLoad = false;
+            }, 500); // Match this with the duration of your transition
+        } else {
+            ctxFrame.clearRect(0, 0, frameCanvas.width, frameCanvas.height);
+            ctxFrame.drawImage(frameImage, 0, 0, frameCanvas.width, newHeight);
+        }
     } else {
         console.error('Frame not found: ' + e.target.value);
     }
@@ -155,10 +213,11 @@ frameSelect.addEventListener('change', function(e) {
 let event = new Event('change');
 frameSelect.dispatchEvent(event);
 
-// ------------------------------------ HAMMER.JS CODE ------------------------------------ //
+// ------------------------------------ HAMMER.JS CODE ------------------------------------------------------- //
+let previewWrapper = document.getElementById('previewWrapper');
 
 // Use Hammer.js to add pinch, zoom, and pan functionality
-let hammer = new Hammer(userCanvas);
+let hammer = new Hammer(userCanvas, { touchAction: 'none' });
 hammer.get('pinch').set({ enable: true });
 hammer.get('pan').set({ enable: true });
 
@@ -171,7 +230,14 @@ let initialScale = 1;
 let initialPosX = 0;
 let initialPosY = 0;
 
+// Assume ctxFrame is the context of the frameCanvas
+let isMoving = false;
+
+let moveFactor = 2; // Increase this value to increase the sensitivity of the pinch gesture for moving the image
+let panMoveFactor = 4; // Increase this value to increase the sensitivity of the pan gesture for moving the image
+
 hammer.on('hammer.input', function(e) {
+    e.preventDefault();
     if (e.isFirst) {
         initialScale = scale;
         initialPosX = posX;
@@ -179,8 +245,42 @@ hammer.on('hammer.input', function(e) {
     }
 });
 
-let moveFactor = 8; // Increase this value to increase the sensitivity of the pinch gesture for moving the image
-let panMoveFactor = 4; // Increase this value to increase the sensitivity of the pan gesture for moving the image
+hammer.on('transformstart panstart', function(e) {
+    // Add the green border
+    previewWrapper.classList.add('green-border');
+    // Set isMoving to true when the image starts moving
+    isMoving = true;
+    // Remove the transition duration for the opacity
+    frameCanvas.style.transition = 'transform 1s, opacity 0s';
+    // Reduce the opacity of the frameCanvas
+    frameCanvas.style.opacity = 0.5; // Change this value to adjust the opacity
+});
+
+hammer.on('transformend panend', function(e) {
+    // Set isMoving back to false when the image stops moving
+    isMoving = false;
+    // Reset the transition duration for the opacity
+    frameCanvas.style.transition = 'transform 1s, opacity 0.5s';
+    // Reset the opacity of the frameCanvas
+    frameCanvas.style.opacity = 1.0;
+    // Remove the green border
+    previewWrapper.classList.remove('green-border');
+});
+
+function drawFrame() {
+    // If the image is moving, reduce the opacity of the frame
+    if (isMoving) {
+        ctxFrame.globalAlpha = 0.5; // Change this value to adjust the opacity
+    } else {
+        ctxFrame.globalAlpha = 1.0;
+    }
+
+    // Draw the frame
+    ctxFrame.drawImage(frameImage, 0, 0, frameCanvas.width, frameCanvas.height);
+
+    // Reset the globalAlpha property
+    ctxFrame.globalAlpha = 1.0;
+}
 
 hammer.on('transform', function(e) {
     // Scale the image based on the pinch gesture
@@ -192,11 +292,20 @@ hammer.on('transform', function(e) {
     posX = initialPosX + (e.deltaX * ((e.pointers.length > 1) ? scale * moveFactor : panMoveFactor));
     posY = initialPosY + (e.deltaY * ((e.pointers.length > 1) ? scale * moveFactor : panMoveFactor));
 
+    // Clear the canvas
     ctxUser.clearRect(0, 0, userCanvas.width, userCanvas.height);
+    // Reduce the opacity of the frameCanvas
+    frameCanvas.style.opacity = 0.5; // Change this value to adjust the opacity
+    // Draw the frame with the current opacity
+    drawFrame();
+    // Draw the image
     ctxUser.drawImage(userImage, posX, posY, userImage.width * scale, userImage.height * scale);
 });
 
 hammer.on('panmove pinchmove', function(e) {
+    // Add the green border
+    previewWrapper.classList.add('green-border');
+
     // Scale the image based on the pinch gesture
     if (e.type === 'pinchmove') {
         scale = initialScale * e.scale;
@@ -206,15 +315,36 @@ hammer.on('panmove pinchmove', function(e) {
     posX = initialPosX + (e.deltaX * ((e.type === 'pinchmove') ? scale * moveFactor : panMoveFactor));
     posY = initialPosY + (e.deltaY * ((e.type === 'pinchmove') ? scale * moveFactor : panMoveFactor));
 
+    // Clear the canvas
     ctxUser.clearRect(0, 0, userCanvas.width, userCanvas.height);
+    // Reduce the opacity of the frameCanvas
+    frameCanvas.style.opacity = 0.5; // Change this value to adjust the opacity
+    // Draw the frame with the current opacity
+    drawFrame();
+    // Draw the image
     ctxUser.drawImage(userImage, posX, posY, userImage.width * scale, userImage.height * scale);
 });
 
+// Define a variable to hold the timeout
+let timeout;
+// Define a flag to check if the green border is already present
+let isGreenBorderPresent = false;
 
 // Listen for the wheel event on the user's canvas
 userCanvas.addEventListener('wheel', function(e) {
     // Prevent the default behavior of the wheel event
     e.preventDefault();
+
+    // Add the green border if it's not already present
+    if (!isGreenBorderPresent) {
+        previewWrapper.classList.add('green-border');
+        isGreenBorderPresent = true;
+    }
+
+    // Clear the previous timeout if it exists
+    if (timeout) {
+        clearTimeout(timeout);
+    }
 
     // Determine the direction of the wheel rotation
     let direction = e.deltaY < 0 ? 1 : -1;
@@ -232,11 +362,34 @@ userCanvas.addEventListener('wheel', function(e) {
     // Update the scale
     scale = newScale;
 
+    // Set isMoving to true when the image starts moving
+    isMoving = true;
+    // Reduce the opacity of the frameCanvas
+    frameCanvas.style.opacity = 0.5; // Change this value to adjust the opacity
+
     // Clear the canvas
     ctxUser.clearRect(0, 0, userCanvas.width, userCanvas.height);
-
     // Draw the image with the new scale
     ctxUser.drawImage(userImage, posX, posY, userImage.width * scale, userImage.height * scale);
+    // Draw the frame with the current opacity
+    drawFrame();
+
+    // Set isMoving back to false when the image stops moving
+    isMoving = false;
+    // Reset the opacity of the frameCanvas
+    frameCanvas.style.opacity = 1.0;
+
+    // Set a timeout to change the border to transparent after a delay
+    timeout = setTimeout(function() {
+        previewWrapper.style.border = '5px dashed transparent';
+
+        // Set another timeout to remove the green border after the transition has completed
+        setTimeout(function() {
+            previewWrapper.classList.remove('green-border');
+            previewWrapper.style.border = ''; // Reset the border style
+            isGreenBorderPresent = false;
+        }); 
+    }, 500); // Change this value to adjust the delay
 }, false);
 
 

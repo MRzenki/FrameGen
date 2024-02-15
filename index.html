@@ -37,7 +37,7 @@
         <div class="input-group1">
             <label for="frame">Select Frame:</label>
             <select id="frame">
-                <option value="frame8.png">In Love</option> 
+                <!-- <option value="frame8.png">In Love</option> 
                 <option value="frame7.png">Blessed</option> 
                 <option value="frame1.png">Single & Blessed</option>
                 <option value="frame6.png">Study First</option> 
@@ -45,17 +45,18 @@
                 <option value="frame3.png">Faithfully Committed</option>
                 <option value="frame5.png">It's Complicated</option> 
                 <option value="frame4.png">Moving Forward</option>
-                <option value="frame9.png">Put God First</option> 
+                <option value="frame9.png">Put God First</option>  -->
                 <!-- Add more frames as needed -->
             </select>
         </div>
         
-        <div id="preview">
-            <canvas id="userCanvas" style="position: absolute;"></canvas>
-            <canvas id="frameCanvas" style="position: absolute;"></canvas>
+        <div id="previewWrapper">
+            <div id="preview">
+                <canvas id="userCanvas" style="position: absolute;"></canvas>
+                <canvas id="frameCanvas" style="position: absolute;"></canvas>
+            </div>
         </div>
 
-        
         <div class="input-group2" id="upload_button">
             <!-- Upload your image: -->
             <label for="user_image" class="custom-file-upload">
@@ -64,6 +65,7 @@
             </label>
             <input type="file" id="user_image" style="display: none;">
         </div>
+
     </form>
 
 
@@ -74,6 +76,11 @@
     <!-- <script src="js/mobilescript.js"></script> -->
     <script src="js/javascript.js"></script>
     <script>
+        window.addEventListener('load', function() {
+            // Set the height of the body to the initial viewport height
+            document.body.style.height = window.innerHeight + 'px';
+        });
+        
         window.addEventListener('scroll', function() {
             if ((window.innerHeight + window.scrollY) >= document.body.offsetHeight) {
                 var footer = document.querySelector('footer');

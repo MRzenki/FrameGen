@@ -68,7 +68,7 @@ header .green {
     align-items: center;
     max-width: 600px;
     margin: 20px auto;
-    padding: 20px 20px 5px 20px;
+    padding: 10px 20px 5px 20px;
     background-color: rgba(255, 255, 255, 0.1); /* Semi-transparent white */
     backdrop-filter: blur(10px); /* Blur the background */
     box-shadow: 0px 0px 10px 0px rgba(0,0,0,0.1);
@@ -76,7 +76,7 @@ header .green {
 }
 
 .input-group1 {
-    margin-bottom: 20px;
+    margin-bottom: 10px;
     text-align: left; /* Align left by default */
     width: 100%;
 }
@@ -126,14 +126,36 @@ select option {
     backdrop-filter: blur(10px); /* Blur the background */
 }
 
+#previewWrapper {
+    user-select: none;
+    width: 300px; 
+    height: 300px; 
+    padding: 3px; /* Add a gap between the border and the canvas */
+    box-sizing: content-box; /* Exclude the padding and border from the element's total width and height */
+    /* transition: border 0.2s ease-out; */
+}
+
 #preview {
     width: 300px;
     height: 300px;
-    position: relative;
+    position: relative; /* Make sure the position is set to relative */
 }
 
 #frameCanvas {
     pointer-events: none;
+    transition: transform 1s, opacity 0.5s;
+}
+
+.dashed-border, .green-border {
+    box-sizing: border-box;
+}
+
+#previewWrapper.dashed-border {
+    border: 3px dashed #8a8a8a; /* Change the color and width as needed */
+}
+
+#previewWrapper.green-border {
+    border: 3px dashed #77eeab; /* Change the color and width as needed */
 }
 
 #userCanvas, #frameCanvas {
