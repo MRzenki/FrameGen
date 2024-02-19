@@ -101,6 +101,27 @@ userCanvas.height = 1080; // Set the height to 1080
 frameCanvas.width = 1080; // Set the width to 1080
 frameCanvas.height = 1080; // Set the height to 1080
 
+// ------------------------------------ IMAGE LOADING CODE ------------------------------------------------------- //
+// Create a new canvas for the blurred background
+let backgroundCanvas = document.createElement('canvas');
+let preview = document.getElementById('preview');
+
+// Set the width and height to match the preview div
+backgroundCanvas.width = preview.offsetWidth;
+backgroundCanvas.height = preview.offsetHeight;
+
+// Position it absolutely
+backgroundCanvas.style.position = 'absolute';
+
+// Place it behind all other canvases
+backgroundCanvas.style.zIndex = -1;
+
+// Append the backgroundCanvas to the preview div
+preview.appendChild(backgroundCanvas);
+
+// Get the context of the backgroundCanvas
+let ctxBackground = backgroundCanvas.getContext('2d');
+
 // Load an image when the user selects a file
 document.getElementById('user_image').addEventListener('change', function(e) {
     let reader = new FileReader();
@@ -110,20 +131,27 @@ document.getElementById('user_image').addEventListener('change', function(e) {
     
     reader.onload = function(event) {
         userImage.onload = function() {
-            // Calculate the correct dimensions for the image to preserve its aspect ratio
-            let aspectRatio = userImage.width / userImage.height;
-            let newWidth = frameCanvas.width; // Set the new width to the width of the frame canvas
-            let newHeight = newWidth / aspectRatio; // Calculate the new height based on the aspect ratio
-        
+            // Reset the position and scale variables
+            posX = 0;
+            posY = 0;
+            scale = 1;
+            initialScale = 1;
+            initialPosX = 0;
+            initialPosY = 0;
+            // Calculate the correct dimensions for the user image to preserve its aspect ratio
+            let userAspectRatio = userImage.width / userImage.height;
+            let userNewWidth = frameCanvas.width; // Set the new width to the width of the frame canvas
+            let userNewHeight = userNewWidth / userAspectRatio; // Calculate the new height based on the aspect ratio
+
             // Calculate an initial scale based on the ratio of the canvas width to the image width
             scale = frameCanvas.width / userImage.width;
-        
-            // Calculate initial posX and posY values to center the image on the canvas
-            posX = (frameCanvas.width - newWidth) / 2;
-            posY = (frameCanvas.height - newHeight) / 2;
-        
+
+            // Calculate initial userPosX and userPosY values to center the image on the canvas
+            let userPosX = (frameCanvas.width - userNewWidth) / 2;
+            let userPosY = (frameCanvas.height - userNewHeight) / 2;
+
             ctxUser.clearRect(0, 0, userCanvas.width, userCanvas.height);
-            ctxUser.drawImage(userImage, posX, posY, userImage.width * scale, userImage.height * scale);
+            ctxUser.drawImage(userImage, userPosX, userPosY, userImage.width * scale, userImage.height * scale);
 
             // Check if the canvas is tainted
             try {
@@ -142,6 +170,46 @@ document.getElementById('user_image').addEventListener('change', function(e) {
 
             // Change the cursor style after the image has been successfully loaded
             document.getElementById('userCanvas').style.cursor = 'move';
+
+            // Create a new canvas to hold the blurred image
+            let blurredCanvas = document.createElement('canvas');
+            blurredCanvas.width = userCanvas.width;
+            blurredCanvas.height = userCanvas.height;
+
+            // Get the context of the blurredCanvas
+            let ctxBlurred = blurredCanvas.getContext('2d');
+
+            // Apply a blur effect to the image
+            ctxBlurred.filter = 'blur(20px)'; // Increase the value to apply more blur
+
+            // Draw the image on the blurredCanvas
+            ctxBlurred.drawImage(userImage, 0, 0, blurredCanvas.width, blurredCanvas.height);
+
+            // Clear the background canvas before drawing the new blurred image
+            ctxBackground.clearRect(0, 0, backgroundCanvas.width, backgroundCanvas.height);
+
+            // Calculate the correct dimensions for the blurred image to preserve its aspect ratio
+            let blurredAspectRatio = userImage.width / userImage.height;
+            let blurredNewWidth, blurredNewHeight;
+
+            if (backgroundCanvas.width / backgroundCanvas.height > blurredAspectRatio) {
+                // If the aspect ratio of the background canvas is greater than the aspect ratio of the image,
+                // set the width of the image to the width of the canvas and calculate the height
+                blurredNewWidth = backgroundCanvas.width;
+                blurredNewHeight = blurredNewWidth / blurredAspectRatio;
+            } else {
+                // If the aspect ratio of the background canvas is less than the aspect ratio of the image,
+                // set the height of the image to the height of the canvas and calculate the width
+                blurredNewHeight = backgroundCanvas.height;
+                blurredNewWidth = blurredNewHeight * blurredAspectRatio;
+            }
+
+            // Calculate the position to center the image on the canvas
+            let blurredPosX = (backgroundCanvas.width - blurredNewWidth) / 2;
+            let blurredPosY = (backgroundCanvas.height - blurredNewHeight) / 2;
+
+            // Draw the blurred image on the backgroundCanvas
+            ctxBackground.drawImage(blurredCanvas, blurredPosX, blurredPosY, blurredNewWidth, blurredNewHeight);
         }
         userImage.onerror = function() {
             // Hide the spinner
@@ -396,8 +464,6 @@ userCanvas.addEventListener('wheel', function(e) {
 
 // ----------------- Add the following code to the end of the javascript.js file -----------------
 
-
-
 // Create a download button
 let downloadButton = document.createElement('button');
 downloadButton.id = 'downloadButton'; // Add an id to the button for styling
@@ -416,11 +482,14 @@ downloadButton.appendChild(buttonText);
 
 // Add an event listener to the download button
 downloadButton.addEventListener('click', function() {
-    // Create a new canvas to combine the user image and the frame
+    // Create a new canvas to combine the user image, the frame, and the blurred background
     let combinedCanvas = document.createElement('canvas');
     combinedCanvas.width = userCanvas.width;
     combinedCanvas.height = userCanvas.height;
     let ctxCombined = combinedCanvas.getContext('2d');
+
+    // Draw the blurred background image on the new canvas
+    ctxCombined.drawImage(backgroundCanvas, 0, 0, combinedCanvas.width, combinedCanvas.height);
 
     // Draw the user image and the frame on the new canvas
     ctxCombined.drawImage(userCanvas, 0, 0);
