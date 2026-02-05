@@ -70,7 +70,10 @@
 
 
     <footer shine>
-        <p>Copyright © 2024 Microdrgz. All rights reserved. Exclusive for LJCCC.</p>
+        <p>Copyright © <span id="year"></span> Microdrgz. All rights reserved. Exclusive for LJCCC.</p>
+        <script>
+            document.getElementById('year').textContent = new Date().getFullYear();
+        </script>
     </footer>
 
     <!-- <script src="js/mobilescript.js"></script> -->
