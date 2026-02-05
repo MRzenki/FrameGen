@@ -150,8 +150,10 @@ document.getElementById('user_image').addEventListener('change', function(e) {
             let userPosX = (frameCanvas.width - userNewWidth) / 2;
             let userPosY = (frameCanvas.height - userNewHeight) / 2;
 
-            ctxUser.clearRect(0, 0, userCanvas.width, userCanvas.height);
-            ctxUser.drawImage(userImage, userPosX, userPosY, userImage.width * scale, userImage.height * scale);
+            posX = userPosX;
+            posY = userPosY;
+            rotationDeg = 0;
+            drawUser();
 
             // Check if the canvas is tainted
             try {
@@ -210,6 +212,29 @@ document.getElementById('user_image').addEventListener('change', function(e) {
 
             // Draw the blurred image on the backgroundCanvas
             ctxBackground.drawImage(blurredCanvas, blurredPosX, blurredPosY, blurredNewWidth, blurredNewHeight);
+
+            // Keep background blur responsive to preview size
+            window.addEventListener('resize', function() {
+                backgroundCanvas.width = preview.offsetWidth;
+                backgroundCanvas.height = preview.offsetHeight;
+
+                ctxBackground.clearRect(0, 0, backgroundCanvas.width, backgroundCanvas.height);
+
+                let ar = userImage.width / userImage.height;
+                let bw, bh;
+                if (backgroundCanvas.width / backgroundCanvas.height > ar) {
+                    bw = backgroundCanvas.width;
+                    bh = bw / ar;
+                } else {
+                    bh = backgroundCanvas.height;
+                    bw = bh * ar;
+                }
+                let bx = (backgroundCanvas.width - bw) / 2;
+                let by = (backgroundCanvas.height - bh) / 2;
+                ctxBackground.filter = 'blur(20px)';
+                ctxBackground.drawImage(userImage, bx, by, bw, bh);
+                ctxBackground.filter = 'none';
+            });
         }
         userImage.onerror = function() {
             // Hide the spinner
@@ -298,6 +323,22 @@ let initialScale = 1;
 let initialPosX = 0;
 let initialPosY = 0;
 
+// Rotation in degrees and helper to draw user image
+let rotationDeg = 0;
+
+function drawUser() {
+    ctxUser.clearRect(0, 0, userCanvas.width, userCanvas.height);
+    const w = userImage.width * scale;
+    const h = userImage.height * scale;
+    const cx = posX + w / 2;
+    const cy = posY + h / 2;
+    ctxUser.save();
+    ctxUser.translate(cx, cy);
+    ctxUser.rotate(rotationDeg * Math.PI / 180);
+    ctxUser.drawImage(userImage, -w / 2, -h / 2, w, h);
+    ctxUser.restore();
+}
+
 // Assume ctxFrame is the context of the frameCanvas
 let isMoving = false;
 
@@ -367,7 +408,7 @@ hammer.on('transform', function(e) {
     // Draw the frame with the current opacity
     drawFrame();
     // Draw the image
-    ctxUser.drawImage(userImage, posX, posY, userImage.width * scale, userImage.height * scale);
+    drawUser();
 });
 
 hammer.on('panmove pinchmove', function(e) {
@@ -390,7 +431,7 @@ hammer.on('panmove pinchmove', function(e) {
     // Draw the frame with the current opacity
     drawFrame();
     // Draw the image
-    ctxUser.drawImage(userImage, posX, posY, userImage.width * scale, userImage.height * scale);
+    drawUser();
 });
 
 // Define a variable to hold the timeout
@@ -438,7 +479,7 @@ userCanvas.addEventListener('wheel', function(e) {
     // Clear the canvas
     ctxUser.clearRect(0, 0, userCanvas.width, userCanvas.height);
     // Draw the image with the new scale
-    ctxUser.drawImage(userImage, posX, posY, userImage.width * scale, userImage.height * scale);
+    drawUser();
     // Draw the frame with the current opacity
     drawFrame();
 
@@ -532,22 +573,19 @@ recenterButtonIcon.src = 'img/reset.png';
 recenterButton.appendChild(recenterButtonIcon);
 
 // Add an event listener to the recenter button
-recenterButton.addEventListener('click', function() {
+function recenter() {
     // Calculate the correct dimensions for the image to preserve its aspect ratio
     let aspectRatio = userImage.width / userImage.height;
-    let newWidth = frameCanvas.width; // Set the new width to the width of the frame canvas
-    let newHeight = newWidth / aspectRatio; // Calculate the new height based on the aspect ratio
-
-    // Calculate an initial scale based on the ratio of the canvas width to the image width
+    let newWidth = frameCanvas.width;
+    let newHeight = newWidth / aspectRatio;
     scale = frameCanvas.width / userImage.width;
-
-    // Calculate initial posX and posY values to center the image on the canvas
     posX = (frameCanvas.width - newWidth) / 2;
     posY = (frameCanvas.height - newHeight) / 2;
+    rotationDeg = 0;
+    drawUser();
+}
 
-    ctxUser.clearRect(0, 0, userCanvas.width, userCanvas.height);
-    ctxUser.drawImage(userImage, posX, posY, userImage.width * scale, userImage.height * scale);
-});
+recenterButton.addEventListener('click', recenter);
 
 // Append the recenter button to the body of the document
 document.body.appendChild(recenterButton);
@@ -559,6 +597,67 @@ recenterButton.style.display = 'none';
 document.getElementById('user_image').addEventListener('change', function(e) {
     recenterButton.style.display = 'flex';
 }, false);
+
+// In-page controls for rotate/zoom/reset
+const rotateLeftBtn = document.getElementById('rotateLeftBtn');
+const rotateRightBtn = document.getElementById('rotateRightBtn');
+const rotationRange = document.getElementById('rotationRange');
+const zoomInBtn = document.getElementById('zoomInBtn');
+const zoomOutBtn = document.getElementById('zoomOutBtn');
+const resetBtn = document.getElementById('resetBtn');
+
+function clampScale(val) {
+    if (val < 0.1) return 0.1;
+    if (val > 3.0) return 3.0;
+    return val;
+}
+
+if (rotateLeftBtn) {
+    rotateLeftBtn.addEventListener('click', function() {
+        rotationDeg = (rotationDeg - 90) % 360;
+        drawUser();
+        drawFrame();
+    });
+}
+
+if (rotateRightBtn) {
+    rotateRightBtn.addEventListener('click', function() {
+        rotationDeg = (rotationDeg + 90) % 360;
+        drawUser();
+        drawFrame();
+    });
+}
+
+if (rotationRange) {
+    rotationRange.addEventListener('input', function(e) {
+        rotationDeg = parseInt(e.target.value, 10) || 0;
+        drawUser();
+        drawFrame();
+    });
+}
+
+if (zoomInBtn) {
+    zoomInBtn.addEventListener('click', function() {
+        scale = clampScale(scale + 0.1);
+        drawUser();
+        drawFrame();
+    });
+}
+
+if (zoomOutBtn) {
+    zoomOutBtn.addEventListener('click', function() {
+        scale = clampScale(scale - 0.1);
+        drawUser();
+        drawFrame();
+    });
+}
+
+if (resetBtn) {
+    resetBtn.addEventListener('click', function() {
+        recenter();
+        if (rotationRange) rotationRange.value = 0;
+    });
+}
 
 
 

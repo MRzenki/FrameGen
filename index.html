@@ -51,9 +51,17 @@
         </div>
         
         <div id="previewWrapper">
-            <div id="preview">
+            <div id="preview" aria-label="Preview area">
                 <canvas id="userCanvas" style="position: absolute;"></canvas>
                 <canvas id="frameCanvas" style="position: absolute;"></canvas>
+            </div>
+            <div class="controls" aria-label="Editing controls">
+                <button type="button" id="rotateLeftBtn" class="control-btn" aria-label="Rotate left">⟲ Rotate</button>
+                <input type="range" id="rotationRange" class="rotate-slider" min="-180" max="180" value="0" aria-label="Rotation">
+                <button type="button" id="rotateRightBtn" class="control-btn" aria-label="Rotate right">Rotate ⟳</button>
+                <!-- <button type="button" id="zoomOutBtn" class="control-btn" aria-label="Zoom out">− Zoom</button> -->
+                <!-- <button type="button" id="zoomInBtn" class="control-btn" aria-label="Zoom in">+ Zoom</button> -->
+                <button type="button" id="resetBtn" class="control-btn" aria-label="Reset">Reset</button>
             </div>
         </div>
 
@@ -63,7 +71,7 @@
                 <img src="img/camera-icon.png" alt="Upload">
                 <span class="upload-text">Choose a photo</span>
             </label>
-            <input type="file" id="user_image" style="display: none;">
+            <input type="file" id="user_image" accept="image/*" capture="environment" style="display: none;">
         </div>
 
     </form>
