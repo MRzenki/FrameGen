@@ -128,14 +128,16 @@ select option {
 
 #previewWrapper {
     user-select: none;
-    width: min(90vw, 500px);
+    width: 300px; 
+    height: 300px; 
     padding: 3px; /* Add a gap between the border and the canvas */
     box-sizing: content-box; /* Exclude the padding and border from the element's total width and height */
+    /* transition: border 0.2s ease-out; */
 }
 
 #preview {
-    width: 100%;
-    aspect-ratio: 1 / 1;
+    width: 300px;
+    height: 300px;
     position: relative; /* Make sure the position is set to relative */
 }
 
@@ -188,36 +190,6 @@ select option {
 }
 .custom-file-upload:hover {
     background: rgba(255, 255, 255, 0.2);
-}
-
-.controls {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    justify-content: center;
-    margin: 10px 0;
-}
-
-.control-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    padding: 6px 10px;
-    cursor: pointer;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 10px;
-    border: 1px solid rgba(255, 255, 255, 0.2);
-    color: white;
-    font-weight: 600;
-    transition: all 0.2s ease;
-}
-
-.control-btn:hover {
-    background: rgba(255, 255, 255, 0.2);
-}
-
-.rotate-slider {
-    width: 60%;
 }
 
 
@@ -281,10 +253,6 @@ footer p{
         width: 100%;
     }
 
-    .rotate-slider {
-        width: 50%;
-    }
-
 
 }
 
@@ -293,10 +261,6 @@ footer p{
 @media (max-width: 600px) {
     .input-group1 {
         text-align: center; /* Align center on mobile devices */
-    }
-
-    .rotate-slider {
-        width: 100%;
     }
 
     #downloadButton:hover, #recenterButton:hover {
